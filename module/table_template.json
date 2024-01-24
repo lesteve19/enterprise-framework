@@ -1,0 +1,26 @@
+{
+    "target": {
+        "S": "${sector}-${category}-${action}-${solution}-${integration}"
+    },
+    "action": {
+        "S": "${action}"
+    },
+    "category": {
+        "S": "${category}"
+    },
+    "current-points": {
+        "N": "0"
+    },
+    "integration": {
+        "S": "${integration}"
+    },
+    "max-points": {
+        "N": "10"
+    },
+    "sector": {
+        "S": "${sector}"
+    },
+    "solution": {
+        "S": "${solution}"
+    }
+}
