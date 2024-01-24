@@ -1,0 +1,12 @@
+How to use scorecard with core competencies
+
+-Are the core competencies available?
+-How do they look against the scorecard
+-Decimal values for scorecard into projects/competencies
+
+Determine dependencies (hard/soft)
+Assess environment based on core competencies
+Build specific projects to close gaps
+Automate population of DynamoDB table's "current points" section for core competencies
+
+Front end data visualization
