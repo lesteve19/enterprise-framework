@@ -65,7 +65,7 @@ for entry in core_list:
             )
 
     else:
-        print(f'{entry} already exists')
+        print(f'.....{entry} already exists')
         continue
 
 
