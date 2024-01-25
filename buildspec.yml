@@ -19,7 +19,7 @@ phases:
       - chmod +x /usr/bin/terraform
       - terraform --version
       - aws --version
-  deploy:
+  build:
     on-failure: ABORT
     commands:
       - terraform init
