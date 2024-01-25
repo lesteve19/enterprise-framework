@@ -8,7 +8,7 @@ task_table = sys.argv[1]
 db_client = boto3.client('dynamodb', region_name=region)
 
 #-----Read table and format list-----#
-def get_tasks(client)
+def get_tasks(client):
     task_map = []
     table_contents = client.scan(TableName = task_table)
     for row in table_contents['Items']:
