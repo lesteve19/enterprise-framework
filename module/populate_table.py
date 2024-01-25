@@ -13,7 +13,7 @@ db_client = boto3.client('dynamodb', region_name=region)
 def get_tasks(client):
     task_map = []
     # try:
-    tabletable = client.describe_table(TableName=task_table)
+    tabletable = client.list_tables()
     print(tabletable)
     table_contents = client.scan(TableName=task_table)
     for row in table_contents['Items']:
