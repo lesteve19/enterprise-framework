@@ -35,7 +35,7 @@ def get_tasks(client):
             task_map.append(task)
     except botocore.exceptions.ResourceNotFoundException as error:
         print("New Table.  No competencies have been populated yet")
-        continue
+        # continue
 
     return task_map
 
