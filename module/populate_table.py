@@ -3,8 +3,8 @@ import json
 import sys
 from string import Template
 
-region = sys.argv[1]
-task_table = sys.argv[2]
+region = "us-east-1"
+task_table = sys.argv[1]
 db_client = boto3.client('dynamodb', region_name=region)
 
 #-----Read table and format list-----#
