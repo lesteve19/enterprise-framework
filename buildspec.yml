@@ -14,6 +14,9 @@ phases:
       python: latest
     commands:
       - python --version
+      - curl -s -qL -o terraform_install.zip https://releases.hashicorp.com/terraform/1.7.1/terraform_1.7.1_linux_amd64.zip
+      - unzip terraform_install.zip -d /usr/bin/
+      - chmod +x /usr/bin/terraform
       - terraform --version
   # pre_build:
   #   run-as: Linux-user-name
