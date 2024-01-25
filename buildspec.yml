@@ -22,6 +22,7 @@ phases:
   build:
     on-failure: ABORT
     commands:
+      - cd nonprod
       - terraform init
       - terraform plan -var="table_name=$TABLE"
   # build:
