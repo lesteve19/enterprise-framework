@@ -4,7 +4,7 @@ import json
 import sys
 from string import Template
 
-region = "us-east-1"
+region = "us-east-2"
 task_table = sys.argv[1]
 print(f'Targeting {task_table} Dynamo table...')
 db_client = boto3.client('dynamodb', region_name=region)
