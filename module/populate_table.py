@@ -5,12 +5,13 @@ from string import Template
 
 region = "us-east-1"
 task_table = sys.argv[1]
+print(f'Targeting {task_table} Dynamo table...')
 db_client = boto3.client('dynamodb', region_name=region)
 
 #-----Read table and format list-----#
 def get_tasks(client):
     task_map = []
-    table_contents = client.scan(TableName = task_table)
+    table_contents = client.scan(TableName=task_table)
     for row in table_contents['Items']:
         task = {}
         taskname = row["target"]["S"]
