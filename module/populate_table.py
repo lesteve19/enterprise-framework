@@ -105,7 +105,7 @@ for task in task_list:
 
 
 for sec in s_list:
-    per = sec["current"]/sec["max"]
+    per = int(sec["current"])/int(sec["max"])
     print("-----------------------------------------------")
     print("-----------------------------------------------")
     print(f'{sec["sector"].upper()} SECTOR')
