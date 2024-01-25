@@ -4,7 +4,11 @@ provider "aws" {
 }
 
 terraform {
-    backend http {}
+    backend "s3" {
+        bucket = "sts-terraform-remote-state"
+        key = "enterprise-framework/enterprise-framework.tfstate"
+        region = "us-east-1"
+    }
 }
 
 module "nonprod" {
