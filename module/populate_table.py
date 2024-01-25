@@ -42,6 +42,16 @@ core_list = open("task_list.txt").read().splitlines()
 onlytasks = []
 for t in task_list:
     onlytasks.append(t["taskname"])
+    if t["taskname"] not in core_list:
+        print(f'REMOVING {t["taskname"]} from table, as it is no longer in the primary task list')
+        db_client.delete_item(
+            TableName = task_table,
+            Key = {
+                "target": {
+                    "S": t["taskname"]
+                }
+            }
+        )
 
 for entry in core_list:
     if entry not in onlytasks:
@@ -67,6 +77,8 @@ for entry in core_list:
     else:
         print(f'.....{entry} already exists')
         continue
+    
+    
 
 
 #-----Calculate points-----#
