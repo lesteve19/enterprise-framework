@@ -1,4 +1,3 @@
-blah-blah-blah-blah-blah
 availability-region-provision-pit_application-primary_solution
 availability-region-provision-pit_application-logging_registration
 availability-region-provision-pit_application-monitoring_registration
