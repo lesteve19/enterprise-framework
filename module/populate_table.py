@@ -12,30 +12,32 @@ db_client = boto3.client('dynamodb', region_name=region)
 #-----Read table and format list-----#
 def get_tasks(client):
     task_map = []
-    try:
-        table_contents = client.scan(TableName=task_table)
-        for row in table_contents['Items']:
-            task = {}
-            taskname = row["target"]["S"]
-            action = row["action"]["S"]
-            category = row["category"]["S"]
-            currentpoints = row["current-points"]["N"]
-            integration = row["integration"]["S"]
-            maxpoints = row["max-points"]["N"]
-            sector = row["sector"]["S"]
-            solution = row["solution"]["S"]
-            task["taskname"]=taskname
-            task["action"]=action
-            task["category"]=category
-            task["currentpoints"]=currentpoints
-            task["integration"]=integration
-            task["maxpoints"]=maxpoints
-            task["sector"]=sector
-            task["solution"]=solution
-            task_map.append(task)
-    except botocore.exceptions.ResourceNotFoundException as error:
-        print("New Table.  No competencies have been populated yet")
-        # continue
+    # try:
+    tabletable = client.describe_table(TableName=task_table)
+    print(tabletable)
+    table_contents = client.scan(TableName=task_table)
+    for row in table_contents['Items']:
+        task = {}
+        taskname = row["target"]["S"]
+        action = row["action"]["S"]
+        category = row["category"]["S"]
+        currentpoints = row["current-points"]["N"]
+        integration = row["integration"]["S"]
+        maxpoints = row["max-points"]["N"]
+        sector = row["sector"]["S"]
+        solution = row["solution"]["S"]
+        task["taskname"]=taskname
+        task["action"]=action
+        task["category"]=category
+        task["currentpoints"]=currentpoints
+        task["integration"]=integration
+        task["maxpoints"]=maxpoints
+        task["sector"]=sector
+        task["solution"]=solution
+        task_map.append(task)
+    # except botocore.exceptions.ResourceNotFoundException as error:
+    #     print("New Table.  No competencies have been populated yet")
+    #     # continue
 
     return task_map
 
