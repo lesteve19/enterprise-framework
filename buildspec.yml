@@ -14,6 +14,7 @@ phases:
       python: latest
     commands:
       - python --version
+      - pip install boto3
       - curl -s -qL -o terraform_install.zip https://releases.hashicorp.com/terraform/1.7.1/terraform_1.7.1_linux_amd64.zip
       - unzip terraform_install.zip -d /usr/bin/
       - chmod +x /usr/bin/terraform
@@ -24,7 +25,7 @@ phases:
     commands:
       - cd nonprod
       - terraform init
-      - terraform plan -var="table_name=$TABLE"
+      - terraform apply -auto-approve -var="table_name=$TABLE"
   # build:
   #   run-as: Linux-user-name
   #   on-failure: ABORT | CONTINUE
