@@ -12,9 +12,6 @@ db_client = boto3.client('dynamodb', region_name=region)
 #-----Read table and format list-----#
 def get_tasks(client):
     task_map = []
-    # try:
-    tabletable = client.list_tables()
-    print(tabletable)
     table_contents = client.scan(TableName=task_table)
     for row in table_contents['Items']:
         task = {}
@@ -35,9 +32,6 @@ def get_tasks(client):
         task["sector"]=sector
         task["solution"]=solution
         task_map.append(task)
-    # except botocore.exceptions.ResourceNotFoundException as error:
-    #     print("New Table.  No competencies have been populated yet")
-    #     # continue
 
     return task_map
 

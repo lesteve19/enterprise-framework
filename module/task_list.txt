@@ -163,6 +163,7 @@ data-volume-deprovision-shared_filesystem-monitoring_deregistration
 data-volume-deprovision-shared_filesystem-scan_deregistration
 devsecops-suite-provision-alerting-primary_solution
 devsecops-suite-provision-artifact_repo-primary_solution
+devsecops-suite-provision-certificate_handler-primary_solution
 devsecops-suite-provision-code_repo-primary_solution
 devsecops-suite-provision-config_mgmt-primary_solution
 devsecops-suite-provision-iac-primary_solution
