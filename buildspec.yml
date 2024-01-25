@@ -19,6 +19,7 @@ phases:
       - chmod +x /usr/bin/terraform
       - terraform --version
       - aws --version
+      - aws s3 ls
   # pre_build:
   #   run-as: Linux-user-name
   #   on-failure: ABORT | CONTINUE
