@@ -1,5 +1,5 @@
 {
-    "target": {
+    "competency": {
         "S": "${sector}-${category}-${action}-${solution}-${integration}"
     },
     "action": {

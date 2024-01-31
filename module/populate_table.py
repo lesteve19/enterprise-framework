@@ -15,7 +15,7 @@ def get_comps(client):
     table_contents = client.scan(TableName=comp_table)
     for row in table_contents['Items']:
         comp = {}
-        compname = row["target"]["S"]
+        compname = row["competency"]["S"]
         action = row["action"]["S"]
         category = row["category"]["S"]
         currentpoints = row["current-points"]["N"]
@@ -47,7 +47,7 @@ for t in comp_list:
         db_client.delete_item(
             TableName = comp_table,
             Key = {
-                "target": {
+                "competency": {
                     "S": t["compname"]
                 }
             }

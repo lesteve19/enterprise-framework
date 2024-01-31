@@ -3,10 +3,10 @@ resource "aws_dynamodb_table" "ent-framework-table" {
     billing_mode    = "PROVISIONED"
     read_capacity   = 5
     write_capacity  = 5
-    hash_key        = "target"
+    hash_key        = "competency"
 
     attribute {
-        name = "target"
+        name = "competency"
         type = "S"
     }
 
