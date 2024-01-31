@@ -24,9 +24,9 @@ phases:
     commands:
       - cd nonprod
       - terraform init
-      - terraform destroy -auto-approve -var="table_name=$TABLE"
-      # - cd ../module
-      # - python populate_table.py $TABLE
+      - terraform apply -auto-approve -var="table_name=$TABLE"
+      - cd ../module
+      - python populate_table.py $TABLE
   # build:
   #   run-as: Linux-user-name
   #   on-failure: ABORT | CONTINUE
