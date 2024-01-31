@@ -5,17 +5,17 @@ import sys
 from string import Template
 
 region = "us-east-2"
-task_table = sys.argv[1]
-print(f'Targeting {task_table} Dynamo table...')
+comp_table = sys.argv[1]
+print(f'Targeting {comp_table} Dynamo table...')
 db_client = boto3.client('dynamodb', region_name=region)
 
 #-----Read table and format list-----#
-def get_tasks(client):
-    task_map = []
-    table_contents = client.scan(TableName=task_table)
+def get_comps(client):
+    comp_map = []
+    table_contents = client.scan(TableName=comp_table)
     for row in table_contents['Items']:
-        task = {}
-        taskname = row["target"]["S"]
+        comp = {}
+        compname = row["target"]["S"]
         action = row["action"]["S"]
         category = row["category"]["S"]
         currentpoints = row["current-points"]["N"]
@@ -23,38 +23,38 @@ def get_tasks(client):
         maxpoints = row["max-points"]["N"]
         sector = row["sector"]["S"]
         solution = row["solution"]["S"]
-        task["taskname"]=taskname
-        task["action"]=action
-        task["category"]=category
-        task["currentpoints"]=currentpoints
-        task["integration"]=integration
-        task["maxpoints"]=maxpoints
-        task["sector"]=sector
-        task["solution"]=solution
-        task_map.append(task)
+        comp["compname"]=compname
+        comp["action"]=action
+        comp["category"]=category
+        comp["currentpoints"]=currentpoints
+        comp["integration"]=integration
+        comp["maxpoints"]=maxpoints
+        comp["sector"]=sector
+        comp["solution"]=solution
+        comp_map.append(comp)
 
-    return task_map
+    return comp_map
 
 
-#-----Check that all tasks are populated in the table-----#
-task_list = get_tasks(db_client)
-core_list = open("task_list.txt").read().splitlines()
-onlytasks = []
-for t in task_list:
-    onlytasks.append(t["taskname"])
-    if t["taskname"] not in core_list:
-        print(f'REMOVING {t["taskname"]} from table, as it is no longer in the primary task list')
+#-----Check that all comps are populated in the table-----#
+comp_list = get_comps(db_client)
+core_list = open("comp_list.txt").read().splitlines()
+onlycomps = []
+for t in comp_list:
+    onlycomps.append(t["compname"])
+    if t["compname"] not in core_list:
+        print(f'REMOVING {t["compname"]} from table, as it is no longer in the primary comp list')
         db_client.delete_item(
-            TableName = task_table,
+            TableName = comp_table,
             Key = {
                 "target": {
-                    "S": t["taskname"]
+                    "S": t["compname"]
                 }
             }
         )
 
 for entry in core_list:
-    if entry not in onlytasks:
+    if entry not in onlycomps:
         print(f'POPULATING {entry}')
         components = entry.split('-')
         data = dict(
@@ -70,7 +70,7 @@ for entry in core_list:
             template = Template(content)
             configuration = json.loads(template.substitute(data))
             db_client.put_item(
-                TableName = task_table,
+                TableName = comp_table,
                 Item = configuration
             )
 
@@ -84,24 +84,24 @@ for entry in core_list:
 #-----Calculate points-----#
 current_points = []
 total_points = []
-task_list = get_tasks(db_client)
+comp_list = get_comps(db_client)
 sector_list = []
 s_list = []
 
-for task in task_list:
-    if task["sector"] not in sector_list:
-        sector_list.append(task["sector"])
-        sector_dict = {"sector": task["sector"], "current": task["currentpoints"], "max": task["maxpoints"], "total": 1}
+for comp in comp_list:
+    if comp["sector"] not in sector_list:
+        sector_list.append(comp["sector"])
+        sector_dict = {"sector": comp["sector"], "current": comp["currentpoints"], "max": comp["maxpoints"], "total": 1}
         s_list.append(sector_dict)
     else:
         for s in s_list:
-            if s["sector"] == task["sector"]:
-                newcurrent = int(s["current"])+int(task["currentpoints"])
-                newmax = int(s["max"])+int(task["maxpoints"])
+            if s["sector"] == comp["sector"]:
+                newcurrent = int(s["current"])+int(comp["currentpoints"])
+                newmax = int(s["max"])+int(comp["maxpoints"])
                 newtotal = s["total"]+1
-                s.update({"sector": task["sector"], "current": int(newcurrent), "max": int(newmax), "total": int(newtotal)})
-    current_points.append(int(task["currentpoints"]))
-    total_points.append(int(task["maxpoints"]))
+                s.update({"sector": comp["sector"], "current": int(newcurrent), "max": int(newmax), "total": int(newtotal)})
+    current_points.append(int(comp["currentpoints"]))
+    total_points.append(int(comp["maxpoints"]))
 
 
 for sec in s_list:
@@ -124,7 +124,7 @@ print("-----------------------------------------------")
 print("-----------------------------------------------")
 print("-----------------------------------------------")
 print("TOTALS")
-print(f'Total core competencies:  {len(task_list)}')
+print(f'Total core competencies:  {len(comp_list)}')
 print(f'Current points achieved:  {cp}')
 print(f'Total possible points:    {tp}')
 print(f'Total percentage:         {percent}%')
