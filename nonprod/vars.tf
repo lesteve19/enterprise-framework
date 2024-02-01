@@ -1,1 +1,1 @@
-variable table_name {}
+variable project_name {}

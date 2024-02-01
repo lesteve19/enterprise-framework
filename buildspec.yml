@@ -3,7 +3,7 @@ version: 0.2
 env:
   shell: bash
   variables:
-    TABLE: "enterprise-framework"
+    PROJECT: "enterprise-framework"
   # secrets-manager:
   #   key: secret-id:json-key:version-stage:version-id
 
@@ -24,7 +24,7 @@ phases:
     commands:
       - cd nonprod
       - terraform init
-      - terraform destroy -auto-approve -var="table_name=$TABLE"
+      - terraform apply -auto-approve -var="project_name=$PROJECT"
       # - cd ../module
       # - python populate_table.py $TABLE
   # build:
