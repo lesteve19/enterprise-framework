@@ -15,5 +15,5 @@ module "nonprod" {
     source = "../module"
     env = "nonprod"
     comp_table_name = "${var.project_name}-competencies"
-    proj_table_name = "${var.project_name}-projects"
+    project_table_name = "${var.project_name}-projects"
 }
