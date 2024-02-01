@@ -9,13 +9,16 @@
         "S": "${category}"
     },
     "current-points": {
-        "N": "0"
+        "N": "${current-points}"
     },
     "integration": {
         "S": "${integration}"
     },
     "max-points": {
-        "N": "10"
+        "N": "${max-points}"
+    },
+    "project-list": {
+        "S": "${project-list}"
     },
     "sector": {
         "S": "${sector}"
