@@ -26,7 +26,7 @@ phases:
       - terraform init
       - terraform apply -auto-approve -var="project_name=$PROJECT"
       # - cd ../module
-      # - python populate_table.py $TABLE
+      # - python table_work.py $PROJECT
   # build:
   #   run-as: Linux-user-name
   #   on-failure: ABORT | CONTINUE

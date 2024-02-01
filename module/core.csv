@@ -1,0 +1,60 @@
+availability-region-provision-pit_application-primary_solution,"Cross-regional app backup ingestion template, Cross-regional app restoration template"
+availability-region-provision-pit_application-logging_registration,"Cross-regional app backup ingestion template, Cross-regional app restoration template"
+availability-region-provision-pit_application-monitoring_registration,"Cross-regional app backup ingestion template, Cross-regional app restoration template"
+availability-region-deprovision-pit_application-logging_deregistration,Cross-regional app backup deregistration template
+availability-region-deprovision-pit_application-monitoring_deregistration,Cross-regional app backup deregistration template
+availability-region-provision-pit_data-primary_solution,"Cross-regional flat file backup template, Cross-regional shared FS backup template, Cross-regional flat file restoration template, Cross-regional shared FS restoration template"
+availability-region-provision-pit_data-logging_registration,"Cross-regional flat file backup template, Cross-regional shared FS backup template, Cross-regional flat file restoration template, Cross-regional shared FS restoration template"
+availability-region-provision-pit_data-monitoring_registration,"Cross-regional flat file backup template, Cross-regional shared FS backup template, Cross-regional flat file restoration template, Cross-regional shared FS restoration template"
+availability-region-deprovision-pit_data-logging_deregistration,"Cross-regional flat file backup deregistration template, Cross-regional shared FS deregistration template"
+availability-region-deprovision-pit_data-monitoring_deregistration,"Cross-regional flat file backup deregistration template, Cross-regional shared FS deregistration template"
+availability-region-provision-pit_infra-primary_solution,"Cross-regional snapshot/image backup template, Cross-regional snapshot/image restoration template"
+availability-region-provision-pit_infra-logging_registration,"Cross-regional snapshot/image backup template, Cross-regional snapshot/image restoration template"
+availability-region-provision-pit_infra-monitoring_registration,"Cross-regional snapshot/image backup template, Cross-regional snapshot/image restoration template"
+availability-region-deprovision-pit_infra-logging_deregistration,Cross-regional snapshot/image backup deregistration template
+availability-region-deprovision-pit_infra-monitoring_deregistration,Cross-regional snapshot/image backup deregistration template
+availability-region-provision-self_healing-primary_solution,"Cross-regional front-end auto-cutover template, Cross-regional back-end auto-cutover template"
+availability-region-provision-self_healing-logging_registration,"Cross-regional front-end auto-cutover template, Cross-regional back-end auto-cutover template"
+availability-region-provision-self_healing-monitoring_registration,"Cross-regional front-end auto-cutover template, Cross-regional back-end auto-cutover template"
+availability-region-deprovision-self_healing-logging_deregistration,Cross-regional self-healing resource deregistration template
+availability-region-deprovision-self_healing-monitoring_deregistration,Cross-regional self-healing resource deregistration template
+availability-region-provision-trans_application-primary_solution,"Cross-regional asyncronous app backup template, Cross-regional asyncronous app restoration template"
+availability-region-provision-trans_application-logging_registration,"Cross-regional asyncronous app backup template, Cross-regional asyncronous app restoration template"
+availability-region-provision-trans_application-monitoring_registration,"Cross-regional asyncronous app backup template, Cross-regional asyncronous app restoration template"
+availability-region-deprovision-trans_application-logging_deregistration,Cross-regional asyncronous app deregistration template
+availability-region-deprovision-trans_application-monitoring_deregistration,Cross-regional asyncronous app deregistration template
+availability-region-provision-trans_data-primary_solution,"Cross-regional asyncronous data backup template, Cross-regional asyncronous data restoration template"
+availability-region-provision-trans_data-logging_registration,"Cross-regional asyncronous data backup template, Cross-regional asyncronous data restoration template"
+availability-region-provision-trans_data-monitoring_registration,"Cross-regional asyncronous data backup template, Cross-regional asyncronous data restoration template"
+availability-region-deprovision-trans_data-logging_deregistration,Cross-regional asyncronous data deregistration template
+availability-region-deprovision-trans_data-monitoring_deregistration,Cross-regional asyncronous data deregistration template
+availability-zone-provision-pit_application-primary_solution,"Single region app backup ingestion template, Single region app restoration template"
+availability-zone-provision-pit_application-logging_registration,"Single region app backup ingestion template, Single region app restoration template"
+availability-zone-provision-pit_application-monitoring_registration,"Single region app backup ingestion template, Single region app restoration template"
+availability-zone-deprovision-pit_application-logging_deregistration,Single region app backup deregistration template
+availability-zone-deprovision-pit_application-monitoring_deregistration,Single region app backup deregistration template
+availability-zone-provision-pit_data-primary_solution,"Single region flat file backup template, Single region shared FS backup template, Single region flat file restoration template, Single region shared FS restoration template"
+availability-zone-provision-pit_data-logging_registration,"Single region flat file backup template, Single region shared FS backup template, Single region flat file restoration template, Single region shared FS restoration template"
+availability-zone-provision-pit_data-monitoring_registration,"Single region flat file backup template, Single region shared FS backup template, Single region flat file restoration template, Single region shared FS restoration template"
+availability-zone-deprovision-pit_data-logging_deregistration,"Single region flat file backup deregistration template, Single region shared FS deregistration template"
+availability-zone-deprovision-pit_data-monitoring_deregistration,"Single region flat file backup deregistration template, Single region shared FS deregistration template"
+availability-zone-provision-pit_infra-primary_solution,"Single region snapshot/image backup template, Single region snapshot/image restoration template"
+availability-zone-provision-pit_infra-logging_registration,"Single region snapshot/image backup template, Single region snapshot/image restoration template"
+availability-zone-provision-pit_infra-monitoring_registration,"Single region snapshot/image backup template, Single region snapshot/image restoration template"
+availability-zone-deprovision-pit_infra-logging_deregistration,Single region snapshot/image backup deregistration template
+availability-zone-deprovision-pit_infra-monitoring_deregistration,Single region snapshot/image backup deregistration template
+availability-zone-provision-self_healing-primary_solution,"Multi-AZ front-end auto-cutover template, Multi-AZ back-end auto-cutover template, Autoscaling template"
+availability-zone-provision-self_healing-logging_registration,"Multi-AZ front-end auto-cutover template, Multi-AZ back-end auto-cutover template, Autoscaling template"
+availability-zone-provision-self_healing-monitoring_registration,"Multi-AZ front-end auto-cutover template, Multi-AZ back-end auto-cutover template, Autoscaling template"
+availability-zone-deprovision-self_healing-logging_deregistration,"Multi-AZ self-healing resource deregistration template, Autoscaling deregistration template"
+availability-zone-deprovision-self_healing-monitoring_deregistration,"Multi-AZ self-healing resource deregistration template, Autoscaling deregistration template"
+availability-zone-provision-trans_application-primary_solution,"Single region asyncronous app backup template, Single region asyncronous app restoration template"
+availability-zone-provision-trans_application-logging_registration,"Single region asyncronous app backup template, Single region asyncronous app restoration template"
+availability-zone-provision-trans_application-monitoring_registration,"Single region asyncronous app backup template, Single region asyncronous app restoration template"
+availability-zone-deprovision-trans_application-logging_deregistration,Single region asyncronous app deregistration template
+availability-zone-deprovision-trans_application-monitoring_deregistration,Single region asyncronous app deregistration template
+availability-zone-provision-trans_data-primary_solution,"Single region asyncronous data backup template, Single region asyncronous data restoration template"
+availability-zone-provision-trans_data-logging_registration,"Single region asyncronous data backup template, Single region asyncronous data restoration template"
+availability-zone-provision-trans_data-monitoring_registration,"Single region asyncronous data backup template, Single region asyncronous data restoration template"
+availability-zone-deprovision-trans_data-logging_deregistration,Single region asyncronous data deregistration template
+availability-zone-deprovision-trans_data-monitoring_deregistration,Single region asyncronous data deregistration template
