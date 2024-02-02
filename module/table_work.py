@@ -19,8 +19,9 @@ db_client = boto3.client('dynamodb', region_name=region)
 
 core_list = open("core.csv").read().splitlines()
 for l in core_list:
-    breakup = l.split(',', 1)[1]
-    print(breakup)
+    comp_itself = l.split(',', 1)[0]
+    comp_projects = l.split(',', 1)[1]
+    print(f'{comp_itself} relies on these projects: {comp_projects}')
 
 
 
