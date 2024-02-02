@@ -3,6 +3,9 @@ import botocore
 import json
 import sys
 from string import Template
+from jira import JIRA
+from botocore.exceptions import ClientError
+
 
 
 #------------------------------------#
@@ -13,17 +16,42 @@ region = "us-east-2"
 project = sys.argv[1]
 comp_table = f'{project}-competencies'
 proj_table = f'{project}-projects'
+secret_name = "jira_token"
 db_client = boto3.client('dynamodb', region_name=region)
+sec_client = boto3.client('secretsmanager', region_name=region)
+
+
+def get_secret():
+    try:
+        get_secret_value_response = sec_client.get_secret_value(
+            SecretId=secret_name
+        )
+    except ClientError as e:
+        # For a list of exceptions thrown, see
+        # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
+        raise e
+
+    api_token = get_secret_value_response['SecretString']
+
+    print(api_token)
 
 
 
-core_list = open("core.csv").read().splitlines()
-for l in core_list:
-    comp_itself = l.split(',', 1)[0]
-    comp_projects = l.split(',', 1)[1]
-    print("-------------------------------------------------------")
-    print(f'{comp_itself} relies on these projects: {comp_projects}')
-    print("-------------------------------------------------------")
+
+
+# jira = JIRA(server="https://keepitsts.atlassian.net", basic_auth("steven.lecompte@simpletechnology.io", api_token))
+
+
+
+
+
+# core_list = open("core.csv").read().splitlines()
+# for l in core_list:
+#     comp_itself = l.split(',', 1)[0]
+#     comp_projects = l.split(',', 1)[1]
+#     print("-------------------------------------------------------")
+#     print(f'{comp_itself} relies on these projects: {comp_projects}')
+#     print("-------------------------------------------------------")
 
 
 # onlycomps = []
