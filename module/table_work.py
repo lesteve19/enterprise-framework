@@ -35,7 +35,7 @@ def get_secret():
 
     print(api_token)
 
-
+get_secret()
 
 
 
