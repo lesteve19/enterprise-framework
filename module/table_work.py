@@ -19,7 +19,8 @@ db_client = boto3.client('dynamodb', region_name=region)
 
 core_list = open("core.csv").read().splitlines()
 for l in core_list:
-    print(l)
+    breakup = l.split('-')
+    print(breakup)
 
 
 
