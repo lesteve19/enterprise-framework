@@ -21,8 +21,9 @@ core_list = open("core.csv").read().splitlines()
 for l in core_list:
     comp_itself = l.split(',', 1)[0]
     comp_projects = l.split(',', 1)[1]
+    print("-------------------------------------------------------")
     print(f'{comp_itself} relies on these projects: {comp_projects}')
-
+    print("-------------------------------------------------------")
 
 
 # onlycomps = []
