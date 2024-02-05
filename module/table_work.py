@@ -41,8 +41,8 @@ api_token = get_secret()
 
 
 # jira = JIRA(server="https://keepitsts.atlassian.net", token_auth=api_token)
-jira = JIRA(server="https://keepitsts.atlassian.net")
-auth_jira = JIRA(basic_auth=("steven.lecompte@simpletechnology.io", api_token))
+jira = JIRA(server="https://keepitsts.atlassian.net", basic_auth=("steven.lecompte@simpletechnology.io", api_token))
+# auth_jira = JIRA(basic_auth=("steven.lecompte@simpletechnology.io", api_token))
 
 
 
