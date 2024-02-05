@@ -44,8 +44,8 @@ api_token = get_secret()
 jira = JIRA(server="https://keepitsts.atlassian.net", basic_auth=("steven.lecompte@simpletechnology.io", api_token))
 
 projects = jira.projects()
-
-print(projects)
+for project in projects:
+    print(project)
 
 
 
