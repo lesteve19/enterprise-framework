@@ -32,10 +32,10 @@ def get_secret():
         raise e
 
     api_token = get_secret_value_response['SecretString']
-    whatkind = type(api_token)
+    api_token = json.loads(api_token)
 
-    # print(api_token[0]["api_token"])
-    print(whatkind)
+    print(api_token["api_token"])
+
 
 get_secret()
 
