@@ -42,8 +42,10 @@ jira = jira_conn()
 
 issues = jira.search_issues("project = 'ENTFRM' ORDER BY created ASC")
 for issue in issues:
-    issue_info = jira.issue_type(issue)
-    print(issue_info)
+    issue_info = jira.issue(issue)
+    issue_type = issue_info.fields.issuetype
+    issue_status = issue_info.fields.status
+    print(f'{issue} status is {issue_status} and has a type of {issue_type}')
 
 
 # projects = jira.projects()
