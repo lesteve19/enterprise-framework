@@ -34,14 +34,13 @@ def get_secret():
     api_token = get_secret_value_response['SecretString']
     api_token = json.loads(api_token)
 
-    print(api_token["api_token"])
+    return api_token["api_token"]
+
+api_token = get_secret()
 
 
-get_secret()
 
-
-
-# jira = JIRA(server="https://keepitsts.atlassian.net", basic_auth("steven.lecompte@simpletechnology.io", api_token))
+jira = JIRA(server="https://keepitsts.atlassian.net", basic_auth("steven.lecompte@simpletechnology.io", api_token))
 
 
 
