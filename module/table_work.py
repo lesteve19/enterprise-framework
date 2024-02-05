@@ -33,7 +33,7 @@ def get_secret():
 
     api_token = get_secret_value_response['SecretString']
 
-    print(api_token["api_token"])
+    print(api_token[0]["api_token"])
 
 get_secret()
 
