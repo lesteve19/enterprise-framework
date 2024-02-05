@@ -19,25 +19,26 @@ proj_table = f'{project}-projects'
 secret_name = "jira_token"
 db_client = boto3.client('dynamodb', region_name=region)
 sec_client = boto3.client('secretsmanager', region_name=region)
+jira_server = "https://keepitsts.atlassian.net"
+jira_user = "steven.lecompte@simpletechnology.io"
 
 
-def get_secret():
+def jira_conn():
     try:
         get_secret_value_response = sec_client.get_secret_value(
             SecretId=secret_name
         )
     except ClientError as e:
-        # For a list of exceptions thrown, see
-        # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
         raise e
 
     api_token = get_secret_value_response['SecretString']
     api_token = json.loads(api_token)
+    jira = JIRA(server=jira_server, basic_auth=(jira_user, api_token["api_token"]))
 
-    return api_token["api_token"]
+    return jira
 
-api_token = get_secret()
-jira = JIRA(server="https://keepitsts.atlassian.net", basic_auth=("steven.lecompte@simpletechnology.io", api_token))
+
+jira = jira_conn()
 
 issues = jira.search_issues("project = 'ENTFRM' ORDER BY created ASC")
 for issue in issues:
