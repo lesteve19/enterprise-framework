@@ -40,7 +40,8 @@ api_token = get_secret()
 jira = JIRA(server="https://keepitsts.atlassian.net", basic_auth=("steven.lecompte@simpletechnology.io", api_token))
 
 issues = jira.search_issues("project = 'ENTFRM' ORDER BY created ASC")
-print(issues)
+for issue in issues:
+    print(issue)
 
 
 # projects = jira.projects()
