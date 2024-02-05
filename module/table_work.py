@@ -37,15 +37,17 @@ def get_secret():
     return api_token["api_token"]
 
 api_token = get_secret()
-
-
-
-
 jira = JIRA(server="https://keepitsts.atlassian.net", basic_auth=("steven.lecompte@simpletechnology.io", api_token))
 
-projects = jira.projects()
-for project in projects:
-    print(project)
+issues = jira.search_issues("project = 'ENTFRM' ORDER BY created ASC")
+print(issues)
+
+
+# projects = jira.projects()
+# print(projects)
+
+# for project in projects:
+#     print(project)
 
 
 
