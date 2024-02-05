@@ -42,7 +42,7 @@ jira = jira_conn()
 
 issues = jira.search_issues("project = 'ENTFRM' ORDER BY created ASC")
 for issue in issues:
-    issue_info = jira.issue(issue)
+    issue_info = jira.issue_properties(issue)
     print(issue_info)
 
 
