@@ -42,13 +42,13 @@ def jira_conn():
 jira = jira_conn()
 
 
-issue_dict = {
-    'project': {'id': jira_proj_id},
-    'summary': f'{proj_title}',
-    'description': 'This project is needed to achieve/improve the {} competency(ies)',
-    'issuetype': {'name': 'Epic'},
-    'labels': [f'entfrm-{sector}'],
-}
+# issue_dict = {
+#     'project': {'id': jira_proj_id},
+#     'summary': f'{proj_title}',
+#     'description': 'This project is needed to achieve/improve the {} competency(ies)',
+#     'issuetype': {'name': 'Epic'},
+#     'labels': [f'entfrm-{sector}'],
+# }
 
 # 'ENTFRM'
 
