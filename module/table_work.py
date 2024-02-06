@@ -43,22 +43,26 @@ jira = jira_conn()
 
 
 issue_dict = {
-    # 'project': {'id': jira_proj_id},
-    # 'summary': 'Updates from jira-python',
-    # 'description': 'Yeah buddy',
-    # 'issuetype': {'name': 'Story'},
-    'labels': ["entfrm-availability", "entfrm-compute"],
+    'project': {'id': jira_proj_id},
+    'summary': f'{proj_title}',
+    'description': 'This project is needed to achieve/improve the {} competency(ies)',
+    'issuetype': {'name': 'Epic'},
+    'labels': [f'entfrm-{sector}'],
 }
 
-issues = jira.search_issues("project = 'ENTFRM' ORDER BY created ASC")
+# 'ENTFRM'
+
+issues = jira.search_issues(f'project = {jira_proj_id} ORDER BY created ASC')
 for issue in issues:
     issue_type = issue.fields.issuetype
-    print(type(issue_type))
     issue_status = issue.fields.status
-    print(f'{issue} status is {issue_status} and has a type of {issue_type}')
-    if str(issue_type) == "Story":
-        print("HOOOOORAYYY")
-        issue.update(fields=issue_dict)
+    print(f'{issue} is a/an {issue_type} and in the following status: {issue_status}')
+    
+    
+    
+    # if str(issue_type) == "Story":
+    #     print("HOOOOORAYYY")
+    #     issue.update(fields=issue_dict)
 
 
 
