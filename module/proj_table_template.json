@@ -1,0 +1,8 @@
+{
+    "project": {
+        "S": "${project_name}"
+    },
+    "jira_id": {
+        "S": "${jira_id}"
+    }
+}

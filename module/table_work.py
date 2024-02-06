@@ -23,7 +23,61 @@ jira_server = "https://keepitsts.atlassian.net"
 jira_user = "steven.lecompte@simpletechnology.io"
 jira_proj_id = 10069
 
+checklist = [
+    {
+        "Alerting": ["Thresholds", "Notifications"]
+    },
+    {
+        "Automation": ["Code/Version Control", "IAC", "Config Mgmt", "Functional Tests", "Security Tests"]
+    },
+    {
+        "Redundancy": ["High Availability", "Disaster Recovery"]
+    },
+    {
+        "Change Control": ["System Owner Gate", "Security Owner Gate", "Technical Gate"]
+    },
+    {
+        "Documentation": ["ReadMe", "Central KB"]
+    },
+    {
+        "Monitoring"  # REVIEW THIS.  YOU LEFT OFF HERE
+    }
+]
 
+
+
+#-----------------------------#
+#----------FUNCTIONS----------#
+#-----------------------------#
+
+#-----Read Competencies table and format list-----#
+def get_comps(client):
+    comp_map = []
+    comp_contents = client.scan(TableName=comp_table)
+    for row in comp_contents['Items']:
+        comp = {}
+        compname = row["competency"]["S"]
+        action = row["action"]["S"]
+        category = row["category"]["S"]
+        currentpoints = row["current-points"]["N"]
+        integration = row["integration"]["S"]
+        maxpoints = row["max-points"]["N"]
+        sector = row["sector"]["S"]
+        solution = row["solution"]["S"]
+        comp["compname"]=compname
+        comp["action"]=action
+        comp["category"]=category
+        comp["currentpoints"]=currentpoints
+        comp["integration"]=integration
+        comp["maxpoints"]=maxpoints
+        comp["sector"]=sector
+        comp["solution"]=solution
+        comp_map.append(comp)
+
+    return comp_map
+
+
+#-----Grab token and create jira connection-----#
 def jira_conn():
     try:
         get_secret_value_response = sec_client.get_secret_value(
@@ -39,7 +93,120 @@ def jira_conn():
     return jira
 
 
+
+#----------------------------#
+#----------WORKFLOW----------#
+#----------------------------#
+
+#-----Read in master list
+#-----For each line in the master list:
+    #---Check to see if competency already exists in competency table
+        #--If competency doesn't exist in table:
+            #-Populate competency table
+            #-If projects required exist in project table and are in JIRA, continue
+            #-Else populate project table and JIRA Epics (projects)
+        #--If competency exists:
+            #-If projects required exist in both project table and JIRA Epics (projects), continue
+            #-Else: 
+                #Create JIRA Epics for projects and grab number IDS (incase title gets changed)
+                #Create JIRA Stories under the Epics based on 8 categories in checklist
+                #Populate projects table
+
+#-----Grab JIRA Epic (project) info:
+    #---Rescan competency table for updated scores
+    #---Status and number of stories/tasks
+    #---Update table current and max points for competency
+    #---Calculate totals
+
+
+
+#-------------------------------------------#
+#----------SOURCE OF TRUTH READ IN----------#
+#-------------------------------------------#
+
+comp_list = get_comps(db_client)
+core_list = open("core.csv").read().splitlines()
+core_comps = []
+onlycomps = []
 jira = jira_conn()
+
+for c in comp_list:
+    onlycomps.append(c["compname"])
+
+for entry in core_list:
+    comp_itself = entry.split(',', 1)[0]
+    core_comps.append(comp_itself)
+    comp_projects = entry.split(',', 1)[1]
+    print("-------------------------------------------------------")
+    print(f'{comp_itself} relies on these projects: {comp_projects}')
+    print("-------------------------------------------------------")
+
+    if comp_itself not in onlycomps:
+        print(f'POPULATING {comp_itself}')
+        components = comp_itself.split('-')
+        data = dict(
+            sector = components[0],
+            category = components[1],
+            action = components[2],
+            solution = components[3],
+            integration = components[4],
+            current_points = 0,
+            max_points = "DO SOMTHING HERE"
+            project_list = comp_projects
+
+        )
+
+        with open('comp_table_template.json', 'r') as json_file:
+            content = ''.join(json_file.readlines())
+            template = Template(content)
+            configuration = json.loads(template.substitute(data))
+            db_client.put_item(
+                TableName = comp_table,
+                Item = configuration
+            )
+        
+        try:
+
+
+
+    else:
+        print(f'.....{comp_itself} .....already exists')
+        continue
+
+
+
+#-----Delete any competencies that are no longer used-----#
+for c in comp_list:
+    if c["compname"] not in core_comps:
+        print(f'REMOVING {c["compname"]} from table, as it is no longer in the primary competency list')
+        db_client.delete_item(
+            TableName = comp_table,
+            Key = {
+                "competency": {
+                    "S": c["compname"]
+                }
+            }
+            )
+
+
+
+
+
+
+#----------------------------------------#
+#----------TABLE CONFIGURATIONS----------#
+#----------------------------------------#
+
+
+
+
+
+
+
+
+
+
+
 
 
 # issue_dict = {
@@ -79,107 +246,24 @@ for issue in issues:
 
 
 
-core_list = open("core.csv").read().splitlines()
-for l in core_list:
-    comp_itself = l.split(',', 1)[0]
-    comp_projects = l.split(',', 1)[1]
-    print("-------------------------------------------------------")
-    print(f'{comp_itself} relies on these projects: {comp_projects}')
-    print("-------------------------------------------------------")
-
-
-# onlycomps = []
-# for t in comp_list:
-#     onlycomps.append(t["compname"])
-#     if t["compname"] not in core_list:
-#         print(f'REMOVING {t["compname"]} from table, as it is no longer in the primary comp list')
-#         db_client.delete_item(
-#             TableName = comp_table,
-#             Key = {
-#                 "competency": {
-#                     "S": t["compname"]
-#                 }
-#             }
-#         )
-
-
-# # ----------------------------------------#
-# # ----------TABLE CONFIGURATIONS----------#
-# # ----------------------------------------#
-
-# # -----Read Competencies table and format list-----#
-# def get_comps(client):
-#     comp_map = []
-#     comp_contents = client.scan(TableName=comp_table)
-#     for row in comp_contents['Items']:
-#         comp = {}
-#         compname = row["competency"]["S"]
-#         action = row["action"]["S"]
-#         category = row["category"]["S"]
-#         currentpoints = row["current-points"]["N"]
-#         integration = row["integration"]["S"]
-#         maxpoints = row["max-points"]["N"]
-#         sector = row["sector"]["S"]
-#         solution = row["solution"]["S"]
-#         comp["compname"]=compname
-#         comp["action"]=action
-#         comp["category"]=category
-#         comp["currentpoints"]=currentpoints
-#         comp["integration"]=integration
-#         comp["maxpoints"]=maxpoints
-#         comp["sector"]=sector
-#         comp["solution"]=solution
-#         comp_map.append(comp)
-
-#     return comp_map
-
-
-# # -----Check that all comps are populated in the table-----#
-# comp_list = get_comps(db_client)
-# core_list = open("comp_list.txt").read().splitlines()
-# onlycomps = []
-# for t in comp_list:
-#     onlycomps.append(t["compname"])
-#     if t["compname"] not in core_list:
-#         print(f'REMOVING {t["compname"]} from table, as it is no longer in the primary comp list')
-#         db_client.delete_item(
-#             TableName = comp_table,
-#             Key = {
-#                 "competency": {
-#                     "S": t["compname"]
-#                 }
-#             }
-#         )
 
 
 
 
 
 
-# for entry in core_list:
-#     if entry not in onlycomps:
-#         print(f'POPULATING {entry}')
-#         components = entry.split('-')
-#         data = dict(
-#             sector = components[0],
-#             category = components[1],
-#             action = components[2],
-#             solution = components[3],
-#             integration = components[4],
-#         )
 
-#         with open('comp_table_template.json', 'r') as json_file:
-#             content = ''.join(json_file.readlines())
-#             template = Template(content)
-#             configuration = json.loads(template.substitute(data))
-#             db_client.put_item(
-#                 TableName = comp_table,
-#                 Item = configuration
-#             )
 
-#     else:
-#         print(f'.....{entry} .....already exists')
-#         continue
+
+
+
+
+
+
+
+
+
+
     
     
 
