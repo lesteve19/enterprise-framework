@@ -43,10 +43,10 @@ jira = jira_conn()
 
 
 issue_dict = {
-    'project': {'id': jira_proj_id},
-    'summary': 'Updates from jira-python',
-    'description': 'Yeah buddy',
-    'issuetype': {'name': 'Story'},
+    # 'project': {'id': jira_proj_id},
+    # 'summary': 'Updates from jira-python',
+    # 'description': 'Yeah buddy',
+    # 'issuetype': {'name': 'Story'},
     'labels': ["entfrm-availability", "entfrm-compute"],
 }
 
@@ -56,7 +56,7 @@ for issue in issues:
     print(type(issue_type))
     issue_status = issue.fields.status
     print(f'{issue} status is {issue_status} and has a type of {issue_type}')
-    if issue_type == "Story":
+    if str(issue_type) == "Story":
         print("HOOOOORAYYY")
         issue.update(fields=issue_dict)
 
