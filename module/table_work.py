@@ -50,7 +50,6 @@ jira = jira_conn()
 #     'labels': [f'entfrm-{sector}'],
 # }
 
-# 'ENTFRM'
 
 issues = jira.search_issues(f'project = {jira_proj_id} ORDER BY created ASC')
 for issue in issues:
@@ -80,13 +79,13 @@ for issue in issues:
 
 
 
-# core_list = open("core.csv").read().splitlines()
-# for l in core_list:
-#     comp_itself = l.split(',', 1)[0]
-#     comp_projects = l.split(',', 1)[1]
-#     print("-------------------------------------------------------")
-#     print(f'{comp_itself} relies on these projects: {comp_projects}')
-#     print("-------------------------------------------------------")
+core_list = open("core.csv").read().splitlines()
+for l in core_list:
+    comp_itself = l.split(',', 1)[0]
+    comp_projects = l.split(',', 1)[1]
+    print("-------------------------------------------------------")
+    print(f'{comp_itself} relies on these projects: {comp_projects}')
+    print("-------------------------------------------------------")
 
 
 # onlycomps = []
@@ -104,11 +103,11 @@ for issue in issues:
 #         )
 
 
-#----------------------------------------#
-#----------TABLE CONFIGURATIONS----------#
-#----------------------------------------#
+# # ----------------------------------------#
+# # ----------TABLE CONFIGURATIONS----------#
+# # ----------------------------------------#
 
-#-----Read Competencies table and format list-----#
+# # -----Read Competencies table and format list-----#
 # def get_comps(client):
 #     comp_map = []
 #     comp_contents = client.scan(TableName=comp_table)
@@ -135,7 +134,7 @@ for issue in issues:
 #     return comp_map
 
 
-#-----Check that all comps are populated in the table-----#
+# # -----Check that all comps are populated in the table-----#
 # comp_list = get_comps(db_client)
 # core_list = open("comp_list.txt").read().splitlines()
 # onlycomps = []
