@@ -53,6 +53,7 @@ issue_dict = {
 issues = jira.search_issues("project = 'ENTFRM' ORDER BY created ASC")
 for issue in issues:
     issue_type = issue.fields.issuetype
+    print(type(issue_type))
     issue_status = issue.fields.status
     print(f'{issue} status is {issue_status} and has a type of {issue_type}')
     if issue_type == "Story":
