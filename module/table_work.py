@@ -56,7 +56,7 @@ for issue in issues:
     issue_type = issue_info.fields.issuetype
     issue_status = issue_info.fields.status
     print(f'{issue} status is {issue_status} and has a type of {issue_type}')
-    if issue.fields.issuetype == "Story"
+    if issue.fields.issuetype == "Story":
         issue.update(fields=issue_dict)
 
 
