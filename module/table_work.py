@@ -21,6 +21,7 @@ db_client = boto3.client('dynamodb', region_name=region)
 sec_client = boto3.client('secretsmanager', region_name=region)
 jira_server = "https://keepitsts.atlassian.net"
 jira_user = "steven.lecompte@simpletechnology.io"
+jira_proj_id = 10069
 
 
 def jira_conn():
@@ -40,12 +41,23 @@ def jira_conn():
 
 jira = jira_conn()
 
-issues = jira.search_issues("project = 'ENTFRM' ORDER BY created ASC")
-for issue in issues:
-    issue_info = jira.issue(issue)
-    issue_type = issue_info.fields.issuetype
-    issue_status = issue_info.fields.status
-    print(f'{issue} status is {issue_status} and has a type of {issue_type}')
+# issues = jira.search_issues("project = 'ENTFRM' ORDER BY created ASC")
+# for issue in issues:
+#     issue_info = jira.issue(issue)
+#     issue_type = issue_info.fields.issuetype
+#     issue_status = issue_info.fields.status
+#     print(f'{issue} status is {issue_status} and has a type of {issue_type}')
+
+
+
+issue_dict = {
+    'project': {'id': jira_proj_id},
+    'summary': 'New issue from jira-python',
+    'description': 'Look into this one',
+    'issuetype': {'name': 'Story'},
+}
+
+jira.create_issue(fields=issue_dict)
 
 
 # projects = jira.projects()
