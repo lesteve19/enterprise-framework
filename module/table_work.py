@@ -41,23 +41,29 @@ def jira_conn():
 
 jira = jira_conn()
 
-# issues = jira.search_issues("project = 'ENTFRM' ORDER BY created ASC")
-# for issue in issues:
-#     issue_info = jira.issue(issue)
-#     issue_type = issue_info.fields.issuetype
-#     issue_status = issue_info.fields.status
-#     print(f'{issue} status is {issue_status} and has a type of {issue_type}')
-
-
 
 issue_dict = {
     'project': {'id': jira_proj_id},
-    'summary': 'New issue from jira-python',
-    'description': 'Look into this one',
+    'summary': 'Updates from jira-python',
+    'description': 'Yeah buddy',
     'issuetype': {'name': 'Story'},
+    'labels': ["entfrm-availability", "entfrm-compute"],
 }
 
-jira.create_issue(fields=issue_dict)
+issues = jira.search_issues("project = 'ENTFRM' ORDER BY created ASC")
+for issue in issues:
+    issue_info = jira.issue(issue)
+    issue_type = issue_info.fields.issuetype
+    issue_status = issue_info.fields.status
+    print(f'{issue} status is {issue_status} and has a type of {issue_type}')
+    if issue.fields.issuetype == "Story"
+        issue.update(fields=issue_dict)
+
+
+
+
+
+# jira.create_issue(fields=issue_dict)
 
 
 # projects = jira.projects()
