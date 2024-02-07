@@ -149,6 +149,7 @@ for p in table_p_list:
     table_projs.append(p["projname"])
 
 #---Iterate through each line in master list and take actions based on status---#
+print("--------------------COMPETENCIES--------------------")
 for entry in core_list:
     #-Grab competency name from master list-#
     comp_itself = entry.split(',', 1)[0]
@@ -192,6 +193,7 @@ for entry in core_list:
 
 #---Check to see if project from master list exists in dynamo table---#
 core_projs = list(set(core_projs))
+print("--------------------PROJECTS--------------------")
 for proj in core_projs:
     if proj not in table_projs:
         
