@@ -133,10 +133,12 @@ for entry in core_list:
     comp_itself = entry.split(',', 1)[0]
     core_comps.append(comp_itself)
     comp_projects = entry.split(',', 1)[1]
+    num_projects = comp_projects.split(',')
+    print(num_projects)
     # comp_projects = comp_projects.replace('"','')
     comp_projects = comp_projects.split(',')
     print(comp_projects)
-    num_projects = comp_projects.split(',')
+    
     # print("-------------------------------------------------------")
     # print(f'{comp_itself} relies on these projects: {comp_projects}')
     # print("-------------------------------------------------------")
