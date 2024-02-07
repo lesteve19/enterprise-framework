@@ -149,8 +149,7 @@ for entry in core_list:
             integration = components[4],
             current_points = 0,
             max_points = len(num_projects)*10,
-            project_list = comp_projects,
-
+            project_list = comp_projects
         )
 
         with open('comp_table_template.json', 'r') as json_file:
