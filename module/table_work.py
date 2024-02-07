@@ -134,6 +134,7 @@ for entry in core_list:
     core_comps.append(comp_itself)
     comp_projects = entry.split(',', 1)[1]
     comp_projects = comp_projects.replace('"','')
+    comp_projects = comp_projects.split(',')
     print(comp_projects)
     num_projects = comp_projects.split(',')
     # print("-------------------------------------------------------")
@@ -217,11 +218,11 @@ for c in table_list:
 # }
 
 
-issues = jira.search_issues(f'project = {jira_proj_id} ORDER BY created ASC')
-for issue in issues:
-    issue_type = issue.fields.issuetype
-    issue_status = issue.fields.status
-    print(f'{issue} is a/an {issue_type} and in the following status: {issue_status}')
+# issues = jira.search_issues(f'project = {jira_proj_id} ORDER BY created ASC')
+# for issue in issues:
+#     issue_type = issue.fields.issuetype
+#     issue_status = issue.fields.status
+#     print(f'{issue} is a/an {issue_type} and in the following status: {issue_status}')
     
     
     
