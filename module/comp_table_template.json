@@ -17,9 +17,6 @@
     "max-points": {
         "N": "${max_points}"
     },
-    "project-list": {
-        "S": "${project_list}"
-    },
     "sector": {
         "S": "${sector}"
     },
