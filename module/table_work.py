@@ -72,7 +72,7 @@ def get_projs(client):
     proj_contents = client.scan(TableName=proj_table)
     for row in proj_contents['Items']:
         proj = {}
-        projname = row["competency"]["S"]
+        projname = row["project"]["S"]
         jiraid = row["jira-id"]["S"]
         proj["projname"]=projname
         proj["jiraid"]=jiraid
