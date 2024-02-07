@@ -3,7 +3,7 @@ import botocore
 import json
 import sys
 from string import Template
-from jira import JIRA
+# from jira import JIRA
 from botocore.exceptions import ClientError
 
 
@@ -68,19 +68,19 @@ def get_comps(client):
 
 
 #-----Grab token and create jira connection-----#
-def jira_conn():
-    try:
-        get_secret_value_response = sec_client.get_secret_value(
-            SecretId=secret_name
-        )
-    except ClientError as e:
-        raise e
+# def jira_conn():
+#     try:
+#         get_secret_value_response = sec_client.get_secret_value(
+#             SecretId=secret_name
+#         )
+#     except ClientError as e:
+#         raise e
 
-    api_token = get_secret_value_response['SecretString']
-    api_token = json.loads(api_token)
-    jira = JIRA(server=jira_server, basic_auth=(jira_user, api_token["api_token"]))
+#     api_token = get_secret_value_response['SecretString']
+#     api_token = json.loads(api_token)
+#     jira = JIRA(server=jira_server, basic_auth=(jira_user, api_token["api_token"]))
 
-    return jira
+#     return jira
 
 
 
@@ -122,7 +122,7 @@ core_list = open("core.csv").read().splitlines()
 
 core_comps = [] # Just the names from the master list #
 table_comps = [] # Just the names from original table scan #
-jira = jira_conn()
+# jira = jira_conn()
 
 #---Adds just the names of competencies gathered from the DynamoDB table---#
 for c in table_list:
@@ -133,6 +133,7 @@ for entry in core_list:
     comp_itself = entry.split(',', 1)[0]
     core_comps.append(comp_itself)
     comp_projects = entry.split(',', 1)[1]
+    print(comp_projects)
     num_projects = comp_projects.split(',')
     print("-------------------------------------------------------")
     print(f'{comp_itself} relies on these projects: {comp_projects}')
@@ -149,8 +150,9 @@ for entry in core_list:
             integration = components[4],
             current_points = 0,
             max_points = len(num_projects)*10,
+            project_list = comp_projects,
         )
-                    # project_list = comp_projects,
+
 
         with open('comp_table_template.json', 'r') as json_file:
             content = ''.join(json_file.readlines())
