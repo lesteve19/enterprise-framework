@@ -133,8 +133,9 @@ for entry in core_list:
     comp_itself = entry.split(',', 1)[0]
     core_comps.append(comp_itself)
     comp_projects = entry.split(',', 1)[1]
-    for comp_project in comp_projects:
-        print(comp_project)
+    print(type(comp_projects))
+    # for comp_project in comp_projects:
+    #     print(comp_project)
     # comp_projects = comp_projects.replace('"','')
     # comp_projects = comp_projects.split(',')
     # print(comp_projects)
