@@ -201,7 +201,8 @@ for proj in core_projs:
             project_name = proj,
         )
             # jira_id = ,
-        #---Populate competency table---#
+        #---Populate projects table---#
+        print(f'POPULATING {proj}')
         with open('proj_table_template.json', 'r') as p_json_file:
             p_content = ''.join(p_json_file.readlines())
             p_template = Template(p_content)
