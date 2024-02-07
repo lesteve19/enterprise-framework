@@ -24,24 +24,14 @@ jira_user = "steven.lecompte@simpletechnology.io"
 jira_proj_id = 10069
 
 checklist = [
-    {
-        "Alerting": ["Thresholds", "Notifications"]
-    },
-    {
-        "Automation": ["Code/Version Control", "IAC", "Config Mgmt", "Functional Tests", "Security Tests"]
-    },
-    {
-        "Redundancy": ["High Availability", "Disaster Recovery"]
-    },
-    {
-        "Change Control": ["System Owner Gate", "Security Owner Gate", "Technical Gate"]
-    },
-    {
-        "Documentation": ["ReadMe", "Central KB"]
-    },
-    {
-        "Monitoring"  # REVIEW THIS.  YOU LEFT OFF HERE
-    }
+    {"Alerting": ["Thresholds", "Notifications"]},
+    {"Automation": ["Code/Version Control", "IAC", "Config Mgmt", "Functional Tests", "Security Tests"]},
+    {"Redundancy": ["High Availability", "Disaster Recovery"]},
+    {"Change Control": ["System Owner Gate", "Security Owner Gate", "Technical Gate"]},
+    {"Documentation": ["ReadMe", "Central KB"]},
+    {"Monitoring": ["Config"]},
+    {"Reporting": ["Pipeline Reports", "Scheduled Reports"]},
+    {"Security": ["IAM", "Network", "Data Mgmt", "Secrets Mgmt"]}
 ]
 
 
@@ -124,37 +114,43 @@ def jira_conn():
 #----------SOURCE OF TRUTH READ IN----------#
 #-------------------------------------------#
 
-comp_list = get_comps(db_client)
+#---Gathers existing competency info (if any) from the DynamoDB table---#
+table_list = get_comps(db_client)
+
+#---Reads the master csv file---#
 core_list = open("core.csv").read().splitlines()
-core_comps = []
-onlycomps = []
+
+core_comps = [] # Just the names from the master list #
+table_comps = [] # Just the names from original table scan #
 jira = jira_conn()
 
-for c in comp_list:
-    onlycomps.append(c["compname"])
+#---Adds just the names of competencies gathered from the DynamoDB table---#
+for c in table_list:
+    table_comps.append(c["compname"])
 
+#---Checks against the master csv list
 for entry in core_list:
     comp_itself = entry.split(',', 1)[0]
     core_comps.append(comp_itself)
     comp_projects = entry.split(',', 1)[1]
+    num_projects = comp_projects.split(',')
     print("-------------------------------------------------------")
     print(f'{comp_itself} relies on these projects: {comp_projects}')
     print("-------------------------------------------------------")
 
-    if comp_itself not in onlycomps:
+    if comp_itself not in table_comps:
         print(f'POPULATING {comp_itself}')
         components = comp_itself.split('-')
-        data = dict(
-            sector = components[0],
-            category = components[1],
-            action = components[2],
-            solution = components[3],
-            integration = components[4],
-            current_points = 0,
-            max_points = "DO SOMTHING HERE"
-            project_list = comp_projects
-
-        )
+        data = {
+            "sector": components[0],
+            "category": components[1],
+            "action": components[2],
+            "solution": components[3],
+            "integration": components[4],
+            "current_points": 0,
+            "max_points": len(num_projects)*10,
+            "project_list": comp_projects
+        }
 
         with open('comp_table_template.json', 'r') as json_file:
             content = ''.join(json_file.readlines())
@@ -165,7 +161,7 @@ for entry in core_list:
                 Item = configuration
             )
         
-        try:
+        # try:
 
 
 
@@ -176,7 +172,7 @@ for entry in core_list:
 
 
 #-----Delete any competencies that are no longer used-----#
-for c in comp_list:
+for c in table_list:
     if c["compname"] not in core_comps:
         print(f'REMOVING {c["compname"]} from table, as it is no longer in the primary competency list')
         db_client.delete_item(
@@ -282,11 +278,11 @@ for issue in issues:
 # #-----Calculate points-----#
 # current_points = []
 # total_points = []
-# comp_list = get_comps(db_client)
+# table_list = get_comps(db_client)
 # sector_list = []
 # s_list = []
 
-# for comp in comp_list:
+# for comp in table_list:
 #     if comp["sector"] not in sector_list:
 #         sector_list.append(comp["sector"])
 #         sector_dict = {"sector": comp["sector"], "current": comp["currentpoints"], "max": comp["maxpoints"], "total": 1}
@@ -322,7 +318,7 @@ for issue in issues:
 # print("-----------------------------------------------")
 # print("-----------------------------------------------")
 # print("TOTALS")
-# print(f'Total core competencies:  {len(comp_list)}')
+# print(f'Total core competencies:  {len(table_list)}')
 # print(f'Current points achieved:  {cp}')
 # print(f'Total possible points:    {tp}')
 # print(f'Total percentage:         {percent}%')
