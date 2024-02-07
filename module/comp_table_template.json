@@ -18,7 +18,7 @@
         "N": "${max_points}"
     },
     "project-list": {
-      "SS": ["${project_list}"]
+      "S": "${project_list}"
     },
     "sector": {
         "S": "${sector}"
