@@ -135,44 +135,42 @@ for entry in core_list:
     comp_projects = entry.split(',', 1)[1]
     comp_projects = comp_projects.replace('"','')
     comp_projects = comp_projects.split(',')
-    print(comp_projects)
-    print(len(comp_projects))
     
     # print("-------------------------------------------------------")
     # print(f'{comp_itself} relies on these projects: {comp_projects}')
     # print("-------------------------------------------------------")
 
-    # if comp_itself not in table_comps:
-    #     print(f'POPULATING {comp_itself}')
-    #     components = comp_itself.split('-')
-    #     data = dict(
-    #         sector = components[0],
-    #         category = components[1],
-    #         action = components[2],
-    #         solution = components[3],
-    #         integration = components[4],
-    #         current_points = 0,
-    #         max_points = len(comp_projects)*10,
-    #         project_list = comp_projects,
-    #     )
+    if comp_itself not in table_comps:
+        print(f'POPULATING {comp_itself}')
+        components = comp_itself.split('-')
+        data = dict(
+            sector = components[0],
+            category = components[1],
+            action = components[2],
+            solution = components[3],
+            integration = components[4],
+            current_points = 0,
+            max_points = len(comp_projects)*10,
+            project_list = comp_projects,
+        )
 
 
-    #     with open('comp_table_template.json', 'r') as json_file:
-    #         content = ''.join(json_file.readlines())
-    #         template = Template(content)
-    #         configuration = json.loads(template.substitute(data))
-    #         db_client.put_item(
-    #             TableName = comp_table,
-    #             Item = configuration
-    #         )
+        with open('comp_table_template.json', 'r') as json_file:
+            content = ''.join(json_file.readlines())
+            template = Template(content)
+            configuration = json.loads(template.substitute(data))
+            db_client.put_item(
+                TableName = comp_table,
+                Item = configuration
+            )
         
-    #     # try:
+        # try:
 
 
 
-    # else:
-    #     print(f'.....{comp_itself} .....already exists')
-    #     continue
+    else:
+        print(f'.....{comp_itself} .....already exists')
+        continue
 
 
 
