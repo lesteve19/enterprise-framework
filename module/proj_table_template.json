@@ -2,7 +2,7 @@
     "project": {
         "S": "${project_name}"
     },
-    "jira_id": {
-        "S": "${jira_id}"
+    "jira-id": {
+        "S": "ENTFRM-12345"
     }
 }

@@ -66,6 +66,20 @@ def get_comps(client):
 
     return comp_map
 
+#-----Read Projects table and format list-----#
+def get_projs(client):
+    proj_map = []
+    proj_contents = client.scan(TableName=proj_table)
+    for row in proj_contents['Items']:
+        proj = {}
+        projname = row["competency"]["S"]
+        jiraid = row["jira-id"]["S"]
+        proj["projname"]=projname
+        proj["jiraid"]=jiraid
+        proj_map.append(proj)
+
+    return proj_map
+
 
 #-----Grab token and create jira connection-----#
 # def jira_conn():
@@ -114,36 +128,42 @@ def get_comps(client):
 #----------SOURCE OF TRUTH READ IN----------#
 #-------------------------------------------#
 
-#---Gathers existing competency info (if any) from the DynamoDB table---#
-table_list = get_comps(db_client)
+#---Gathers existing competency and project info (if any) from the DynamoDB tables---#
+table_c_list = get_comps(db_client)
+table_p_list = get_projs(db_client)
 
 #---Reads the master csv file---#
 core_list = open("core.csv").read().splitlines()
 
-core_comps = [] # Just the names from the master list #
-table_comps = [] # Just the names from original table scan #
+#---Lists for comparing the master list against the dynamo tables---#
+core_comps = [] # Just the competency names from the master list #
+core_projs = [] # Just the project names from the master list #
+table_comps = [] # Just the competency names from table scan #
+table_projs = [] # Just the project names from the table scan #
 # jira = jira_conn()
 
-#---Adds just the names of competencies gathered from the DynamoDB table---#
-for c in table_list:
+#---Adds just the names of competencies and projects gathered from the DynamoDB tables---#
+for c in table_c_list:
     table_comps.append(c["compname"])
+for p in table_p_list:
+    table_projs.append(p["projname"])
 
-#---Checks against the master csv list
+#---Iterate through each line in master list and take actions based on status---#
 for entry in core_list:
+    #-Grab competency name from master list-#
     comp_itself = entry.split(',', 1)[0]
     core_comps.append(comp_itself)
+    #-Grab associated project names from master list-#
     comp_projects = entry.split(',', 1)[1]
     comp_projects = comp_projects.replace('"','')
     comp_projects = comp_projects.split(',')
-    
-    # print("-------------------------------------------------------")
-    # print(f'{comp_itself} relies on these projects: {comp_projects}')
-    # print("-------------------------------------------------------")
+    for cproject in comp_projects:
+        core_projs.append(cproject)
 
+    #---Check to see if competency from master list exists in dynamo table---#
     if comp_itself not in table_comps:
-        print(f'POPULATING {comp_itself}')
         components = comp_itself.split('-')
-        data = dict(
+        c_data = dict(
             sector = components[0],
             category = components[1],
             action = components[2],
@@ -154,28 +174,51 @@ for entry in core_list:
             project_list = comp_projects,
         )
 
-
-        with open('comp_table_template.json', 'r') as json_file:
-            content = ''.join(json_file.readlines())
-            template = Template(content)
-            configuration = json.loads(template.substitute(data))
+        #---Populate competency table---#
+        print(f'POPULATING {comp_itself}')
+        with open('comp_table_template.json', 'r') as c_json_file:
+            c_content = ''.join(c_json_file.readlines())
+            c_template = Template(c_content)
+            c_configuration = json.loads(c_template.substitute(c_data))
             db_client.put_item(
                 TableName = comp_table,
-                Item = configuration
+                Item = c_configuration
             )
-        
-        # try:
-
-
 
     else:
         print(f'.....{comp_itself} .....already exists')
         continue
 
+    #---Check to see if project from master list exists in dynamo table---#
+    for proj in core_projs:
+        if proj not in table_projs:
+            
+            # Do JIRA creation here
+
+            p_data = dict(
+                project_name = proj,
+                # jira_id = ,
+            )
+            #---Populate competency table---#
+            with open('proj_table_template.json', 'r') as p_json_file:
+                p_content = ''.join(p_json_file.readlines())
+                p_template = Template(p_content)
+                p_configuration = json.loads(p_template.substitute(p_data))
+                db_client.put_item(
+                    TableName = proj_table,
+                    Item = p_configuration
+                )
+        
+        else:
+            print(f'.....{proj} .....already exists')
+            continue
+
+
+
 
 
 #-----Delete any competencies that are no longer used-----#
-for c in table_list:
+for c in table_c_list:
     if c["compname"] not in core_comps:
         print(f'REMOVING {c["compname"]} from table, as it is no longer in the primary competency list')
         db_client.delete_item(
@@ -281,11 +324,11 @@ for c in table_list:
 # #-----Calculate points-----#
 # current_points = []
 # total_points = []
-# table_list = get_comps(db_client)
+# table_c_list = get_comps(db_client)
 # sector_list = []
 # s_list = []
 
-# for comp in table_list:
+# for comp in table_c_list:
 #     if comp["sector"] not in sector_list:
 #         sector_list.append(comp["sector"])
 #         sector_dict = {"sector": comp["sector"], "current": comp["currentpoints"], "max": comp["maxpoints"], "total": 1}
@@ -321,7 +364,7 @@ for c in table_list:
 # print("-----------------------------------------------")
 # print("-----------------------------------------------")
 # print("TOTALS")
-# print(f'Total core competencies:  {len(table_list)}')
+# print(f'Total core competencies:  {len(table_c_list)}')
 # print(f'Current points achieved:  {cp}')
 # print(f'Total possible points:    {tp}')
 # print(f'Total percentage:         {percent}%')
