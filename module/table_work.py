@@ -189,29 +189,29 @@ for entry in core_list:
         print(f'.....{comp_itself} .....already exists')
         continue
 
-    #---Check to see if project from master list exists in dynamo table---#
-    for proj in core_projs:
-        if proj not in table_projs:
+    # #---Check to see if project from master list exists in dynamo table---#
+    # for proj in core_projs:
+    #     if proj not in table_projs:
             
-            # Do JIRA creation here
+    #         # Do JIRA creation here
 
-            p_data = dict(
-                project_name = proj,
-                # jira_id = ,
-            )
-            #---Populate competency table---#
-            with open('proj_table_template.json', 'r') as p_json_file:
-                p_content = ''.join(p_json_file.readlines())
-                p_template = Template(p_content)
-                p_configuration = json.loads(p_template.substitute(p_data))
-                db_client.put_item(
-                    TableName = proj_table,
-                    Item = p_configuration
-                )
+    #         p_data = dict(
+    #             project_name = proj,
+    #             # jira_id = ,
+    #         )
+    #         #---Populate competency table---#
+    #         with open('proj_table_template.json', 'r') as p_json_file:
+    #             p_content = ''.join(p_json_file.readlines())
+    #             p_template = Template(p_content)
+    #             p_configuration = json.loads(p_template.substitute(p_data))
+    #             db_client.put_item(
+    #                 TableName = proj_table,
+    #                 Item = p_configuration
+    #             )
         
-        else:
-            print(f'.....{proj} .....already exists')
-            continue
+    #     else:
+    #         print(f'.....{proj} .....already exists')
+    #         continue
 
 
 
