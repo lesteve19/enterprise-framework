@@ -141,7 +141,7 @@ for entry in core_list:
     if comp_itself not in table_comps:
         print(f'POPULATING {comp_itself}')
         components = comp_itself.split('-')
-        data = {
+        data = dict(
             sector = components[0],
             category = components[1],
             action = components[2],
@@ -150,7 +150,8 @@ for entry in core_list:
             current_points = 0,
             max_points = len(num_projects)*10,
             project_list = comp_projects,
-        }
+
+        )
 
         with open('comp_table_template.json', 'r') as json_file:
             content = ''.join(json_file.readlines())
