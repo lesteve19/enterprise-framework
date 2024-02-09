@@ -3,6 +3,6 @@
         "S": "${project_name}"
     },
     "jira-id": {
-        "S": "ENTFRM-12345"
+        "S": "${jira_id}"
     }
 }
