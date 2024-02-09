@@ -140,7 +140,7 @@ core_list = open("foundations.csv").read().splitlines()
 
 #---Lists for comparing the master list against the dynamo tables---#
 core_comps = [] # Just the competency names from the foundation list #
-core_projs = [] # Just the project names from the foundation list #
+proj_map = [] # Just the project names from the foundation list #
 table_comps = [] # Just the competency names from table scan #
 table_projs = [] # Just the project names from the table scan #
 
@@ -171,7 +171,7 @@ for entry in core_list:
         proj_dict = {}
         proj_dict["projname"]=cproject
         proj_dict["projsector"]=components[0]
-        core_projs.append(proj_dict)
+        proj_map.append(proj_dict)
 
     #---Check to see if competency from master list exists in dynamo table---#
     if comp_itself not in table_comps:
@@ -219,7 +219,7 @@ print("------------------------------------------------")
 print("--------------------PROJECTS--------------------")
 print("------------------------------------------------")
 #---Check to see if project from master list exists in dynamo table---#
-core_projs = list(set(core_projs))
+core_projs = [i for n, i in enumerate(proj_map) if i not in proj_map[:n]]
 jira = jira_conn()
 for proj in core_projs:
     if proj["projname"] not in table_projs:
