@@ -223,7 +223,6 @@ core_projs = [i for n, i in enumerate(proj_map) if i not in proj_map[:n]]
 jira = jira_conn()
 for proj in core_projs:
     if proj["projname"] not in table_projs:
-        print(f'Creating JIRA Epic issue for {proj["projname"]}...')
         issue_dict = {
             'project': {'id': jira_proj_id},
             'summary': f'{proj["projname"]}',
@@ -232,11 +231,11 @@ for proj in core_projs:
             'labels': [f'entfrm-{proj["projsector"]}'],
         }
         jid = jira.create_issue(fields=issue_dict)
-        print(jid)
+        print(f'{jid} has been created as an Epic issue for {proj["projname"]}...')
 
         p_data = dict(
             project_name = proj,
-            # jira_id = ,
+            jira_id = jid,
         )
 
         #---Populate projects table---#
@@ -266,6 +265,7 @@ for issue in issues:
     issue_type = issue.fields.issuetype
     issue_status = issue.fields.status
     print(f'{issue} is a/an {issue_type} and in the following status: {issue_status}')
+    issue.delete()
     
     
 
