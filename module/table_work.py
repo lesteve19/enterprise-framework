@@ -3,7 +3,7 @@ import botocore
 import json
 import sys
 from string import Template
-# from jira import JIRA
+from jira import JIRA
 from botocore.exceptions import ClientError
 
 
@@ -66,6 +66,7 @@ def get_comps(client):
 
     return comp_map
 
+
 #-----Read Projects table and format list-----#
 def get_projs(client):
     proj_map = []
@@ -82,19 +83,19 @@ def get_projs(client):
 
 
 #-----Grab token and create jira connection-----#
-# def jira_conn():
-#     try:
-#         get_secret_value_response = sec_client.get_secret_value(
-#             SecretId=secret_name
-#         )
-#     except ClientError as e:
-#         raise e
+def jira_conn():
+    try:
+        get_secret_value_response = sec_client.get_secret_value(
+            SecretId=secret_name
+        )
+    except ClientError as e:
+        raise e
 
-#     api_token = get_secret_value_response['SecretString']
-#     api_token = json.loads(api_token)
-#     jira = JIRA(server=jira_server, basic_auth=(jira_user, api_token["api_token"]))
+    api_token = get_secret_value_response['SecretString']
+    api_token = json.loads(api_token)
+    jira = JIRA(server=jira_server, basic_auth=(jira_user, api_token["api_token"]))
 
-#     return jira
+    return jira
 
 
 
@@ -125,22 +126,27 @@ def get_projs(client):
 
 
 #-------------------------------------------#
-#----------SOURCE OF TRUTH READ IN----------#
+#----------FOUNDATION FILE READ IN----------#
 #-------------------------------------------#
+
+#---Reads the origination csv file---#
+core_list = open("foundations.csv").read().splitlines()
+
+
+
+#---------------------------------------------------------#
+#----------INITIAL TABLE AND JIRA CONFIGURATIONS----------#
+#---------------------------------------------------------#
+
+#---Lists for comparing the master list against the dynamo tables---#
+core_comps = [] # Just the competency names from the foundation list #
+core_projs = [] # Just the project names from the foundation list #
+table_comps = [] # Just the competency names from table scan #
+table_projs = [] # Just the project names from the table scan #
 
 #---Gathers existing competency and project info (if any) from the DynamoDB tables---#
 table_c_list = get_comps(db_client)
 table_p_list = get_projs(db_client)
-
-#---Reads the master csv file---#
-core_list = open("core.csv").read().splitlines()
-
-#---Lists for comparing the master list against the dynamo tables---#
-core_comps = [] # Just the competency names from the master list #
-core_projs = [] # Just the project names from the master list #
-table_comps = [] # Just the competency names from table scan #
-table_projs = [] # Just the project names from the table scan #
-# jira = jira_conn()
 
 #---Adds just the names of competencies and projects gathered from the DynamoDB tables---#
 for c in table_c_list:
@@ -148,22 +154,27 @@ for c in table_c_list:
 for p in table_p_list:
     table_projs.append(p["projname"])
 
-#---Iterate through each line in master list and take actions based on status---#
+print("----------------------------------------------------")
 print("--------------------COMPETENCIES--------------------")
+print("----------------------------------------------------")
+#---Iterate through each line in master list and take actions based on status---#
 for entry in core_list:
     #-Grab competency name from master list-#
     comp_itself = entry.split(',', 1)[0]
+    components = comp_itself.split('-')
     core_comps.append(comp_itself)
     #-Grab associated project names from master list-#
     comp_projects = entry.split(',', 1)[1]
     comp_projects = comp_projects.replace('"','')
     comp_projects = comp_projects.split(',')
     for cproject in comp_projects:
-        core_projs.append(cproject)
+        proj_dict = {}
+        proj_dict["projname"]=cproject
+        proj_dict["projsector"]=components[0]
+        core_projs.append(proj_dict)
 
     #---Check to see if competency from master list exists in dynamo table---#
     if comp_itself not in table_comps:
-        components = comp_itself.split('-')
         c_data = dict(
             sector = components[0],
             category = components[1],
@@ -190,38 +201,6 @@ for entry in core_list:
         print(f'.....{comp_itself} .....already exists')
         continue
 
-
-#---Check to see if project from master list exists in dynamo table---#
-core_projs = list(set(core_projs))
-print("--------------------PROJECTS--------------------")
-for proj in core_projs:
-    if proj not in table_projs:
-        
-        # Do JIRA creation here
-
-        p_data = dict(
-            project_name = proj,
-        )
-            # jira_id = ,
-        #---Populate projects table---#
-        print(f'POPULATING {proj}')
-        with open('proj_table_template.json', 'r') as p_json_file:
-            p_content = ''.join(p_json_file.readlines())
-            p_template = Template(p_content)
-            p_configuration = json.loads(p_template.substitute(p_data))
-            db_client.put_item(
-                TableName = proj_table,
-                Item = p_configuration
-            )
-    
-    else:
-        print(f'.....{proj} .....already exists')
-        continue
-
-
-
-
-
 #-----Delete any competencies that are no longer used-----#
 for c in table_c_list:
     if c["compname"] not in core_comps:
@@ -236,52 +215,66 @@ for c in table_c_list:
             )
 
 
+print("------------------------------------------------")
+print("--------------------PROJECTS--------------------")
+print("------------------------------------------------")
+#---Check to see if project from master list exists in dynamo table---#
+core_projs = list(set(core_projs))
+jira = jira_conn()
+for proj in core_projs:
+    if proj["projname"] not in table_projs:
+        print(f'Creating JIRA Epic issue for {proj["projname"]}...')
+        issue_dict = {
+            'project': {'id': jira_proj_id},
+            'summary': f'{proj["projname"]}',
+            'description': f'{proj["projname"]}',
+            'issuetype': {'name': 'Epic'},
+            'labels': [f'entfrm-{proj["projsector"]}'],
+        }
+        jid = jira.create_issue(fields=issue_dict)
+        print(jid)
+
+        p_data = dict(
+            project_name = proj,
+            # jira_id = ,
+        )
+
+        #---Populate projects table---#
+        print(f'POPULATING {proj["projname"]} in Projects DynamoDB table...')
+        with open('proj_table_template.json', 'r') as p_json_file:
+            p_content = ''.join(p_json_file.readlines())
+            p_template = Template(p_content)
+            p_configuration = json.loads(p_template.substitute(p_data))
+            db_client.put_item(
+                TableName = proj_table,
+                Item = p_configuration
+            )
+    
+    else:
+        print(f'.....{proj["projname"]} .....already exists')
+        continue
+
+
+#---DELETE PROJECTS SECTION HERE---#
 
 
 
 
-#----------------------------------------#
-#----------TABLE CONFIGURATIONS----------#
-#----------------------------------------#
 
-
-
-
-
-
-
-
-
-
-
-
-
-# issue_dict = {
-#     'project': {'id': jira_proj_id},
-#     'summary': f'{proj_title}',
-#     'description': 'This project is needed to achieve/improve the {} competency(ies)',
-#     'issuetype': {'name': 'Epic'},
-#     'labels': [f'entfrm-{sector}'],
-# }
-
-
-# issues = jira.search_issues(f'project = {jira_proj_id} ORDER BY created ASC')
-# for issue in issues:
-#     issue_type = issue.fields.issuetype
-#     issue_status = issue.fields.status
-#     print(f'{issue} is a/an {issue_type} and in the following status: {issue_status}')
+issues = jira.search_issues(f'project = {jira_proj_id} ORDER BY created ASC')
+for issue in issues:
+    issue_type = issue.fields.issuetype
+    issue_status = issue.fields.status
+    print(f'{issue} is a/an {issue_type} and in the following status: {issue_status}')
     
     
-    
-    # if str(issue_type) == "Story":
-    #     print("HOOOOORAYYY")
-    #     issue.update(fields=issue_dict)
 
 
 
 
 
-# jira.create_issue(fields=issue_dict)
+
+
 
 
 # projects = jira.projects()
@@ -290,36 +283,10 @@ for c in table_c_list:
 # for project in projects:
 #     print(project)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     
-    
-
-# #-----Read Projects table and format list-----#
-# def get_projs(client):
-#     proj_map = []
-#     proj_contents = client.scan(TableName=proj_table)
-#     for row in comp_contents['Items']:
-#         print("DO STUFF")
+    # if str(issue_type) == "Story":
+    #     print("HOOOOORAYYY")
+    #     issue.update(fields=issue_dict)
 
 
 
