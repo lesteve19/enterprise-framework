@@ -34,7 +34,12 @@ checklist = [
     {"Security": ["IAM", "Network", "Data Mgmt", "Secrets Mgmt"]}
 ]
 
+tasks = 0
 
+for task in checklist:
+    key = list(task.keys())[0]
+    for value in task[key]:
+        tasks = tasks +1
 
 #-----------------------------#
 #----------FUNCTIONS----------#
@@ -157,11 +162,11 @@ for p in table_p_list:
 print("----------------------------------------------------")
 print("--------------------COMPETENCIES--------------------")
 print("----------------------------------------------------")
-#---Iterate through each line in master list and take actions based on status---#
+#---Iterate through each line in master list and create separate objects---#
 for entry in core_list:
     #-Grab competency name from master list-#
     comp_itself = entry.split(',', 1)[0]
-    components = comp_itself.split('-')
+    sect = comp_itself.split('-', 1)[0]
     core_comps.append(comp_itself)
     #-Grab associated project names from master list-#
     comp_projects = entry.split(',', 1)[1]
@@ -170,11 +175,13 @@ for entry in core_list:
     for cproject in comp_projects:
         proj_dict = {}
         proj_dict["projname"]=cproject
-        proj_dict["projsector"]=components[0]
+        proj_dict["projsector"]=sect
         proj_map.append(proj_dict)
 
     #---Check to see if competency from master list exists in dynamo table---#
-    if comp_itself not in table_comps:
+for cc in core_comps:
+    if cc not in table_comps:
+        components = cc.split('-')
         c_data = dict(
             sector = components[0],
             category = components[1],
@@ -182,12 +189,12 @@ for entry in core_list:
             solution = components[3],
             integration = components[4],
             current_points = 0,
-            max_points = len(comp_projects)*10,
+            max_points = len(comp_projects)*tasks,
             project_list = comp_projects,
         )
 
         #---Populate competency table---#
-        print(f'POPULATING {comp_itself} in Competency DynamoDB table...')
+        print(f'POPULATING {cc} in Competency DynamoDB table...')
         with open('comp_table_template.json', 'r') as c_json_file:
             c_content = ''.join(c_json_file.readlines())
             c_template = Template(c_content)
@@ -198,7 +205,7 @@ for entry in core_list:
             )
 
     else:
-        print(f'.....{comp_itself} .....already exists')
+        print(f'.....{cc} .....already exists')
         continue
 
 #-----Delete any competencies that are no longer used-----#
@@ -256,6 +263,7 @@ for proj in core_projs:
         )
 
         #---Populate projects table---#
+        print("----------------")
         print(f'POPULATING {proj["projname"]} in Projects DynamoDB table...')
         with open('proj_table_template.json', 'r') as p_json_file:
             p_content = ''.join(p_json_file.readlines())
@@ -276,12 +284,12 @@ for proj in core_projs:
 
 
 
-issues = jira.search_issues(f'project = {jira_proj_id} ORDER BY created ASC')
-for issue in issues:
-    issue_type = issue.fields.issuetype
-    issue_status = issue.fields.status
-    print(f'{issue} is a/an {issue_type} and in the following status: {issue_status}')
-    # issue.delete()
+# issues = jira.search_issues(f'project = {jira_proj_id} ORDER BY created ASC')
+# for issue in issues:
+#     issue_type = issue.fields.issuetype
+#     issue_status = issue.fields.status
+#     print(f'{issue} is a/an {issue_type} and in the following status: {issue_status}')
+#     # issue.delete()
     
     
 
