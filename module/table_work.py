@@ -158,6 +158,10 @@ for c in table_c_list:
 for p in table_p_list:
     table_projs.append(p["projname"])
 
+
+print("----------------------------------------------------")
+print("--------------------COMPETENCIES--------------------")
+print("----------------------------------------------------")
 #---Iterate through each line in master list and create separate objects---#
 for entry in core_list:
     #-Grab competency name from master list-#
@@ -174,9 +178,6 @@ for entry in core_list:
         proj_dict["projsector"]=components[0]
         proj_map.append(proj_dict)
 
-    print("----------------------------------------------------")
-    print("--------------------COMPETENCIES--------------------")
-    print("----------------------------------------------------")
     #---Check to see if competency from master list exists in dynamo table---#
     if comp_itself not in table_comps:
         c_data = dict(
