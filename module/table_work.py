@@ -162,7 +162,7 @@ for p in table_p_list:
 for entry in core_list:
     #-Grab competency name from master list-#
     comp_itself = entry.split(',', 1)[0]
-    sect = comp_itself.split('-', 1)[0]
+    components = comp_itself.split('-')
     core_comps.append(comp_itself)
     #-Grab associated project names from master list-#
     comp_projects = entry.split(',', 1)[1]
@@ -171,18 +171,14 @@ for entry in core_list:
     for cproject in comp_projects:
         proj_dict = {}
         proj_dict["projname"]=cproject
-        proj_dict["projsector"]=sect
+        proj_dict["projsector"]=components[0]
         proj_map.append(proj_dict)
 
-
-
-print("----------------------------------------------------")
-print("--------------------COMPETENCIES--------------------")
-print("----------------------------------------------------")
-#---Check to see if competency from master list exists in dynamo table---#
-for cc in core_comps:
-    if cc not in table_comps:
-        components = cc.split('-')
+    print("----------------------------------------------------")
+    print("--------------------COMPETENCIES--------------------")
+    print("----------------------------------------------------")
+    #---Check to see if competency from master list exists in dynamo table---#
+    if comp_itself not in table_comps:
         c_data = dict(
             sector = components[0],
             category = components[1],
@@ -195,7 +191,7 @@ for cc in core_comps:
         )
 
         #---Populate competency table---#
-        print(f'POPULATING {cc} in Competency DynamoDB table...')
+        print(f'POPULATING {comp_itself} in Competency DynamoDB table...')
         with open('comp_table_template.json', 'r') as c_json_file:
             c_content = ''.join(c_json_file.readlines())
             c_template = Template(c_content)
@@ -206,7 +202,7 @@ for cc in core_comps:
             )
 
     else:
-        print(f'.....{cc} .....already exists')
+        print(f'.....{comp_itself} .....already exists')
         continue
 
 #-----Delete any competencies that are no longer used-----#
