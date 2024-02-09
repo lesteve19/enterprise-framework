@@ -35,7 +35,6 @@ checklist = [
 ]
 
 tasks = 0
-
 for task in checklist:
     key = list(task.keys())[0]
     for value in task[key]:
@@ -159,9 +158,6 @@ for c in table_c_list:
 for p in table_p_list:
     table_projs.append(p["projname"])
 
-print("----------------------------------------------------")
-print("--------------------COMPETENCIES--------------------")
-print("----------------------------------------------------")
 #---Iterate through each line in master list and create separate objects---#
 for entry in core_list:
     #-Grab competency name from master list-#
@@ -178,7 +174,12 @@ for entry in core_list:
         proj_dict["projsector"]=sect
         proj_map.append(proj_dict)
 
-    #---Check to see if competency from master list exists in dynamo table---#
+
+
+print("----------------------------------------------------")
+print("--------------------COMPETENCIES--------------------")
+print("----------------------------------------------------")
+#---Check to see if competency from master list exists in dynamo table---#
 for cc in core_comps:
     if cc not in table_comps:
         components = cc.split('-')
