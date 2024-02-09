@@ -278,7 +278,7 @@ story_dict = {
     'summary': 'teststoryunderepic',
     'description': 'teststoryunderepic',
     'issuetype': {'name': 'Story'},
-    'parent': 'ENTFRM-137',
+    'parent': {'key': 'ENTFRM-137'},
 }
 
 sjid = jira.create_issue(fields=story_dict)
