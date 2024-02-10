@@ -283,14 +283,31 @@ for proj in core_projs:
 
 #############  LEFT OFF HEERE  CHECK JIRA STORY STATUS LINKED TO AN EPIC AND THEN UPDATE TABLE POINTS
 
-# jira = jira_conn()
+table_c_list = get_comps(db_client)
+table_p_list = get_projs(db_client)
+jira = jira_conn()
 
-# # issues = jira.search_issues(f'project = {jira_proj_id} ORDER BY created ASC')
-# issues = jira.search_issues(f'project = {jira_proj_id} AND parent = ENTFRM-1095')
-# for issue in issues:
-#     issue_type = issue.fields.issuetype
-#     issue_status = issue.fields.status
-#     print(f'{issue} is a/an {issue_type} and in the following status: {issue_status}')
+p_status = []
+
+for p in table_p_list:
+    p_dict = {}
+    child_issues = 0
+    done_issues = 0
+    jira_id = p["jira-id"]
+    p_dict["jira-id"]=jira_id
+    issues = jira.search_issues(f'project = {jira_proj_id} AND parent = {jira_id}')
+    for issue in issues:
+        child_issues = child_issues + 1
+        # issue_type = issue.fields.issuetype
+        issue_status = issue.fields.status
+        if str(issue_status) == "Done":
+            done_issues = done_issues + 1
+    p_dict["done"]=done_issues
+    p_status.append(p_dict)
+    perc = int(done_issues)/int(child_issues)
+    print(f'{p["projname"]} has {done_issues} of {child_issues} or {round(perc*100,2)} ')
+
+        # print(f'{issue} is a/an {issue_type} and in the following status: {issue_status}')
 #     # issue.delete()
     
     
