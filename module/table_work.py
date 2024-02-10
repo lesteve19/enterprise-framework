@@ -293,8 +293,8 @@ for p in table_p_list:
     p_dict = {}
     child_issues = 0
     done_issues = 0
-    jira_id = p["jira-id"]
-    p_dict["jira-id"]=jira_id
+    jira_id = p["jiraid"]
+    p_dict["jiraid"]=jira_id
     issues = jira.search_issues(f'project = {jira_proj_id} AND parent = {jira_id}')
     for issue in issues:
         child_issues = child_issues + 1
