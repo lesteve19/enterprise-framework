@@ -281,8 +281,12 @@ for proj in core_projs:
 
 
 
+#############  LEFT OFF HEERE  CHECK JIRA STORY STATUS LINKED TO AN EPIC AND THEN UPDATE TABLE POINTS
 
-# issues = jira.search_issues(f'project = {jira_proj_id} ORDER BY created ASC')
+# jira = jira_conn()
+
+# # issues = jira.search_issues(f'project = {jira_proj_id} ORDER BY created ASC')
+# issues = jira.search_issues(f'project = {jira_proj_id} AND parent = ENTFRM-1095')
 # for issue in issues:
 #     issue_type = issue.fields.issuetype
 #     issue_status = issue.fields.status
