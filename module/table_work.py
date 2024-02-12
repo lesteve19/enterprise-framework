@@ -316,7 +316,7 @@ for c in table_c_list:
     current_points = c["currentpoints"]
     projects = c["projectlist"].replace('[','').replace(']','').replace("'", "")
     projects = projects.split(",")
-    print("projects")
+    print(projects)
     for project in projects:
         project = project.strip()
         print("--------------------------------------------------")
