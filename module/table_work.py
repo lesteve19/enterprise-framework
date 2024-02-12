@@ -81,7 +81,7 @@ def get_projs(client):
         proj = {}
         projname = row["project"]["S"]
         jiraid = row["jira-id"]["S"]
-        proj["projname"]=projname
+        proj["projname"]=projname.strip()
         proj["jiraid"]=jiraid
         proj_map.append(proj)
 
@@ -327,8 +327,8 @@ for c in table_c_list:
                 'project': {'S': project}
             }
         )
-        # jid = response['Item'] #['jira-id']['S']
-        print(response)
+        jid = response['Item']['jira-id']['S']
+        print(jid)
 
 
 
