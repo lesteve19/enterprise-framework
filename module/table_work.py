@@ -310,10 +310,22 @@ table_c_list = get_comps(db_client)
 #     # print(f'{p["projname"]} has {done_issues} of {child_issues} or {round(perc*100,2)} ')
 print("--------------------------------BREAK--------------------------------")
 for c in table_c_list:
+    competency = c["compname"]
+    current_points = c["currentpoints"]
     projects = c["projectlist"].replace('[','').replace(']','').replace("'", "")
     projects = projects.split(",")
     for project in projects:
-        print(project.strip())
+        project = project.strip()
+        response = db_client.get_item(
+            TableName=proj_table,
+            Key={
+                'project': {'S': project}
+            }
+        )
+        jid = response["Items"]["jira-id"]["S"]
+        print(jid)
+
+
 
         # print(f'{issue} is a/an {issue_type} and in the following status: {issue_status}')
 #     # issue.delete()
