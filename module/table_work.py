@@ -290,13 +290,6 @@ table_c_list = get_comps(db_client)
 # table_p_list = get_projs(db_client)
 jira = jira_conn()
 
-issues = jira.search_issues(f'project = {jira_proj_id} AND parent = "ENTFRM-1139"')
-for issue in issues:
-    issue.delete()
-
-issues = jira.search_issues(f'project = {jira_proj_id} AND parent = "ENTFRM-1161"')
-for issue in issues:
-    issue.delete()
 
 # p_status = []
 
@@ -319,10 +312,13 @@ for issue in issues:
 #     # print(f'{p["projname"]} has {done_issues} of {child_issues} or {round(perc*100,2)} ')
 print("--------------------------------BREAK--------------------------------")
 for c in table_c_list:
+    child_issues = 0
+    done_issues = 0
     competency = c["compname"]
     print("--------------------------------------------------")
     print(competency)
     current_points = c["currentpoints"]
+    max_points = c["maxpoints"]
     projects = c["projectlist"].replace('[','').replace(']','').replace("'", "")
     projects = projects.split(",")
     print(projects)
@@ -337,7 +333,38 @@ for c in table_c_list:
             }
         )
         jid = response['Item']['jira-id']['S']
-        print(jid)
+        issues = jira.search_issues(f'project = {jira_proj_id} AND parent = {jid}')
+        for issue in issues:
+            child_issues = child_issues + 1
+            issue_status = issue.fields.status
+            if str(issue_status) == "Done":
+                done_issues = done_issues + 1
+    # update table item here
+    if str(current_points) != done_issues:
+        print(f'{competency} has a score update!!!')
+        print(f'Current points = {current_points}/{max_points}')
+        print(f'UPDATED points = {done_issues}/{max_points}')
+        update_curr = db_client.update_item(
+            TableName=comp_table,
+            Key={
+                'competency': competency
+            },
+            UpdateExpression="SET current-points = :currentpoints",
+            ExpressionAttributeValues={
+                ":currentpoints": done_issues
+            }
+        )
+
+    # update_max = db_client.update_item(
+    #     TableName=comp_table,
+    #     Key={
+    #         'competency': c["compname"]
+    #     },
+    #     UpdateExpression="SET max-points = :maxpoints",
+    #     ExpressionAttributeValues={
+    #         ":maxpoints": child_issues
+    #     }
+    # )
 
 
 
