@@ -351,7 +351,7 @@ for c in table_c_list:
             },
             UpdateExpression="SET current-points = :currentpoints",
             ExpressionAttributeValues={
-                ":currentpoints": {"S":done_issues}
+                ":currentpoints": {"N":str(done_issues)}
             }
         )
 
