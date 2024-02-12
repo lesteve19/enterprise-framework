@@ -327,8 +327,8 @@ for c in table_c_list:
                 'project': {'S': project}
             }
         )
-        jid = response['Item'] #['jira-id']['S']
-        print(jid)
+        # jid = response['Item'] #['jira-id']['S']
+        print(response)
 
 
 
