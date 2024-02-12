@@ -349,7 +349,10 @@ for c in table_c_list:
             Key={
                 'competency': {'S': competency}
             },
-            UpdateExpression="SET current-points = :currentpoints",
+            UpdateExpression="SET #currentpoints = :currentpoints",
+            ExpressionAttributeNames={
+                "#currentpoints": "current-points"
+            },
             ExpressionAttributeValues={
                 ":currentpoints": {"N":str(done_issues)}
             }
