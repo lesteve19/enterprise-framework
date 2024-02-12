@@ -322,7 +322,7 @@ for c in table_c_list:
                 'project': {'S': project}
             }
         )
-        jid = response["Items"]["jira-id"]["S"]
+        jid = response["Item"]["jira-id"]["S"]
         print(jid)
 
 
