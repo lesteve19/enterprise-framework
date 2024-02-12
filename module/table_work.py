@@ -340,7 +340,7 @@ for c in table_c_list:
             if str(issue_status) == "Done":
                 done_issues = done_issues + 1
     # update table item here
-    if str(current_points) != done_issues:
+    if int(current_points) != done_issues:
         print(f'{competency} has a score update!!!')
         print(f'Current points = {current_points}/{max_points}')
         print(f'UPDATED points = {done_issues}/{max_points}')
