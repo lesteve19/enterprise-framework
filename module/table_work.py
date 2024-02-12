@@ -311,11 +311,16 @@ table_c_list = get_comps(db_client)
 print("--------------------------------BREAK--------------------------------")
 for c in table_c_list:
     competency = c["compname"]
+    print("--------------------------------------------------")
+    print(competency)
     current_points = c["currentpoints"]
     projects = c["projectlist"].replace('[','').replace(']','').replace("'", "")
     projects = projects.split(",")
+    print("projects")
     for project in projects:
         project = project.strip()
+        print("--------------------------------------------------")
+        print(project)
         response = db_client.get_item(
             TableName=proj_table,
             Key={
