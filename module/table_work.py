@@ -347,11 +347,11 @@ for c in table_c_list:
         update_curr = db_client.update_item(
             TableName=comp_table,
             Key={
-                'competency': f'{competency}'
+                'competency': {'S': competency}
             },
             UpdateExpression="SET current-points = :currentpoints",
             ExpressionAttributeValues={
-                ":currentpoints": f'{done_issues}'
+                ":currentpoints": {"N":done_issues}
             }
         )
 
