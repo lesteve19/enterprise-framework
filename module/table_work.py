@@ -229,17 +229,18 @@ print("------------------------------------------------")
 core_projs = [i for n, i in enumerate(proj_map) if i not in proj_map[:n]]
 jira = jira_conn()
 for proj in core_projs:
-    if proj["projname"] not in table_projs:
+    projname = proj["projname"].strip()
+    if projname not in table_projs:
         epic_dict = {
             'project': {'id': jira_proj_id},
-            'summary': f'{proj["projname"]}',
-            'description': f'{proj["projname"]}',
+            'summary': f'{projname}',
+            'description': f'{projname}',
             'issuetype': {'name': 'Epic'},
             'labels': [f'entfrm-sect-{proj["projsector"]}'],
         }
         ejid = jira.create_issue(fields=epic_dict)
         print("-----------")
-        print(f'{ejid} has been created as an Epic issue for {proj["projname"]}...')
+        print(f'{ejid} has been created as an Epic issue for {projname}...')
         print("------")
 
         for task in checklist:
@@ -247,24 +248,24 @@ for proj in core_projs:
             for value in task[key]:
                 story_dict = {
                     'project': {'id': jira_proj_id},
-                    'summary': f'{key}-{value}-{proj["projname"]}',
-                    'description': f'{key}-{value}-{proj["projname"]}',
+                    'summary': f'{key}-{value}-{projname}',
+                    'description': f'{key}-{value}-{projname}',
                     'issuetype': {'name': 'Story'},
                     'labels': [f'entfrm-sect-{proj["projsector"]}', f'entfrm-imp-{key}'],
                     'parent': {'key': f'{ejid}'},
                 }
             
                 sjid = jira.create_issue(fields=story_dict)
-                print(f'{sjid} has been created as a story under the Epic {ejid} for {key}-{value}-{proj["projname"]}...')
+                print(f'{sjid} has been created as a story under the Epic {ejid} for {key}-{value}-{projname}...')
 
         p_data = dict(
-            project_name = proj["projname"],
+            project_name = projname,
             jira_id = ejid,
         )
 
         #---Populate projects table---#
         print("----------------")
-        print(f'POPULATING {proj["projname"]} in Projects DynamoDB table...')
+        print(f'POPULATING {projname} in Projects DynamoDB table...')
         with open('proj_table_template.json', 'r') as p_json_file:
             p_content = ''.join(p_json_file.readlines())
             p_template = Template(p_content)
@@ -275,7 +276,7 @@ for proj in core_projs:
             )
     
     else:
-        print(f'.....{proj["projname"]} .....already exists')
+        print(f'.....{projname} .....already exists')
         continue
 
 
@@ -287,7 +288,15 @@ for proj in core_projs:
 
 table_c_list = get_comps(db_client)
 # table_p_list = get_projs(db_client)
-# jira = jira_conn()
+jira = jira_conn()
+
+issues = jira.search_issues(f'project = {jira_proj_id} AND parent = "ENTFRM-1139"')
+for issue in issues:
+    issue.delete()
+
+issues = jira.search_issues(f'project = {jira_proj_id} AND parent = "ENTFRM-1161"')
+for issue in issues:
+    issue.delete()
 
 # p_status = []
 
