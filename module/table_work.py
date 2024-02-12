@@ -56,6 +56,7 @@ def get_comps(client):
         currentpoints = row["current-points"]["N"]
         integration = row["integration"]["S"]
         maxpoints = row["max-points"]["N"]
+        projectlist = row["project-list"]["S"]
         sector = row["sector"]["S"]
         solution = row["solution"]["S"]
         comp["compname"]=compname
@@ -64,6 +65,7 @@ def get_comps(client):
         comp["currentpoints"]=currentpoints
         comp["integration"]=integration
         comp["maxpoints"]=maxpoints
+        comp["projectlist"]=projectlist
         comp["sector"]=sector
         comp["solution"]=solution
         comp_map.append(comp)
@@ -284,28 +286,33 @@ for proj in core_projs:
 #############  LEFT OFF HEERE  CHECK JIRA STORY STATUS LINKED TO AN EPIC AND THEN UPDATE TABLE POINTS
 
 table_c_list = get_comps(db_client)
-table_p_list = get_projs(db_client)
-jira = jira_conn()
+# table_p_list = get_projs(db_client)
+# jira = jira_conn()
 
-p_status = []
+# p_status = []
 
-for p in table_p_list:
-    p_dict = {}
-    child_issues = 0
-    done_issues = 0
-    jira_id = p["jiraid"]
-    p_dict["jiraid"]=jira_id
-    issues = jira.search_issues(f'project = {jira_proj_id} AND parent = {jira_id}')
-    for issue in issues:
-        child_issues = child_issues + 1
-        # issue_type = issue.fields.issuetype
-        issue_status = issue.fields.status
-        if str(issue_status) == "Done":
-            done_issues = done_issues + 1
-    p_dict["done"]=done_issues
-    p_status.append(p_dict)
-    perc = int(done_issues)/int(child_issues)
-    print(f'{p["projname"]} has {done_issues} of {child_issues} or {round(perc*100,2)} ')
+# for p in table_p_list:
+#     p_dict = {}
+#     child_issues = 0
+#     done_issues = 0
+#     jira_id = p["jiraid"]
+#     p_dict["jiraid"]=jira_id
+#     issues = jira.search_issues(f'project = {jira_proj_id} AND parent = {jira_id}')
+#     for issue in issues:
+#         child_issues = child_issues + 1
+#         # issue_type = issue.fields.issuetype
+#         issue_status = issue.fields.status
+#         if str(issue_status) == "Done":
+#             done_issues = done_issues + 1
+#     p_dict["done"]=done_issues
+#     p_status.append(p_dict)
+#     perc = int(done_issues)/int(child_issues)
+#     # print(f'{p["projname"]} has {done_issues} of {child_issues} or {round(perc*100,2)} ')
+print("--------------------------------BREAK--------------------------------")
+for c in table_c_list:
+    projects = c["projectlist"]
+    for project in projects:
+        print(project)
 
         # print(f'{issue} is a/an {issue_type} and in the following status: {issue_status}')
 #     # issue.delete()
