@@ -310,7 +310,7 @@ table_c_list = get_comps(db_client)
 #     # print(f'{p["projname"]} has {done_issues} of {child_issues} or {round(perc*100,2)} ')
 print("--------------------------------BREAK--------------------------------")
 for c in table_c_list:
-    projects = c["projectlist"].replace('[','').replace(']','').replace("'", "")
+    projects = c["projectlist"].replace('[','').replace(']','').replace("'", "").replace(', ', ',')
     print(projects)
     # for project in projects:
     #     print(project)
