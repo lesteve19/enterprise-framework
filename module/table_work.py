@@ -315,17 +315,12 @@ for c in table_c_list:
     child_issues = 0
     done_issues = 0
     competency = c["compname"]
-    print("--------------------------------------------------")
-    print(competency)
     current_points = c["currentpoints"]
     max_points = c["maxpoints"]
     projects = c["projectlist"].replace('[','').replace(']','').replace("'", "")
     projects = projects.split(",")
-    print(projects)
     for project in projects:
         project = project.strip()
-        print("--------------------------------------------------")
-        print(project)
         response = db_client.get_item(
             TableName=proj_table,
             Key={
