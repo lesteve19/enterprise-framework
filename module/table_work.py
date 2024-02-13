@@ -109,8 +109,8 @@ def jira_conn():
 #----------WORKFLOW----------#
 #----------------------------#
 
-#-----Read in master list
-#-----For each line in the master list:
+#-----Read in foundations list as starting point
+#-----For each line in the foundations list:
     #---Check to see if competency already exists in competency table
         #--If competency doesn't exist in table:
             #-Populate competency table
@@ -144,7 +144,7 @@ core_list = open("foundations.csv").read().splitlines()
 #----------INITIAL TABLE AND JIRA CONFIGURATIONS----------#
 #---------------------------------------------------------#
 
-#---Lists for comparing the master list against the dynamo tables---#
+#---Lists for comparing the foundations list against the dynamo tables---#
 core_comps = [] # Just the competency names from the foundation list #
 proj_map = [] # Just the project names from the foundation list #
 table_comps = [] # Just the competency names from table scan #
@@ -164,13 +164,16 @@ for p in table_p_list:
 print("----------------------------------------------------")
 print("--------------------COMPETENCIES--------------------")
 print("----------------------------------------------------")
-#---Iterate through each line in master list and create separate objects---#
+
+#---Iterate through each line in foundations list and create separate objects---#
 for entry in core_list:
-    #-Grab competency name from master list-#
+    
+#-Grab competency name from foundations list-#
     comp_itself = entry.split(',', 1)[0]
     components = comp_itself.split('-')
     core_comps.append(comp_itself)
-    #-Grab associated project names from master list-#
+    
+#-Grab associated project names from foundations list-#
     comp_projects = entry.split(',', 1)[1]
     comp_projects = comp_projects.replace('"','')
     comp_projects = comp_projects.split(',')
@@ -180,7 +183,7 @@ for entry in core_list:
         proj_dict["projsector"]=components[0]
         proj_map.append(proj_dict)
 
-    #---Check to see if competency from master list exists in dynamo table---#
+#---Check to see if competency from foundations list exists in dynamo table---#
     if comp_itself not in table_comps:
         c_data = dict(
             sector = components[0],
@@ -193,7 +196,7 @@ for entry in core_list:
             project_list = comp_projects,
         )
 
-        #---Populate competency table---#
+#---Populate competency table---#
         print(f'POPULATING {comp_itself} in Competency DynamoDB table...')
         with open('comp_table_template.json', 'r') as c_json_file:
             c_content = ''.join(c_json_file.readlines())
@@ -225,11 +228,15 @@ for c in table_c_list:
 print("------------------------------------------------")
 print("--------------------PROJECTS--------------------")
 print("------------------------------------------------")
-#---Check to see if project from master list exists in dynamo table---#
+
+#---Pull in projects from foundations list and create jira connection---#
 core_projs = [i for n, i in enumerate(proj_map) if i not in proj_map[:n]]
 jira = jira_conn()
+
 for proj in core_projs:
     projname = proj["projname"].strip()
+
+#---Create JIRA EPIC/Project if it doesn't exist---#
     if projname not in table_projs:
         epic_dict = {
             'project': {'id': jira_proj_id},
@@ -243,6 +250,7 @@ for proj in core_projs:
         print(f'{ejid} has been created as an Epic issue for {projname}...')
         print("------")
 
+#---Create JIRA Stories/Subtasks under EPIC/Project---#
         for task in checklist:
             key = list(task.keys())[0]
             for value in task[key]:
@@ -263,7 +271,7 @@ for proj in core_projs:
             jira_id = ejid,
         )
 
-        #---Populate projects table---#
+#---Populate projects table---#
         print("----------------")
         print(f'POPULATING {projname} in Projects DynamoDB table...')
         with open('proj_table_template.json', 'r') as p_json_file:
@@ -284,33 +292,15 @@ for proj in core_projs:
 
 
 
-#############  LEFT OFF HEERE  CHECK JIRA STORY STATUS LINKED TO AN EPIC AND THEN UPDATE TABLE POINTS
+#------------------------------------------------------#
+#----------JIRA STATUS GRAB AND TABLE UPDATES----------#
+#------------------------------------------------------#
 
+#---Rescan Dynamo table and refresh JIRA connection---#
 table_c_list = get_comps(db_client)
-# table_p_list = get_projs(db_client)
 jira = jira_conn()
 
-
-# p_status = []
-
-# for p in table_p_list:
-#     p_dict = {}
-#     child_issues = 0
-#     done_issues = 0
-#     jira_id = p["jiraid"]
-#     p_dict["jiraid"]=jira_id
-#     issues = jira.search_issues(f'project = {jira_proj_id} AND parent = {jira_id}')
-#     for issue in issues:
-#         child_issues = child_issues + 1
-#         # issue_type = issue.fields.issuetype
-#         issue_status = issue.fields.status
-#         if str(issue_status) == "Done":
-#             done_issues = done_issues + 1
-#     p_dict["done"]=done_issues
-#     p_status.append(p_dict)
-#     perc = int(done_issues)/int(child_issues)
-#     # print(f'{p["projname"]} has {done_issues} of {child_issues} or {round(perc*100,2)} ')
-print("--------------------------------BREAK--------------------------------")
+#---Gather info on JIRA tasks---#
 for c in table_c_list:
     child_issues = 0
     done_issues = 0
@@ -334,7 +324,8 @@ for c in table_c_list:
             issue_status = issue.fields.status
             if str(issue_status) == "Done":
                 done_issues = done_issues + 1
-    # update table item here
+
+#---Update table if project task status changes---#
     if int(current_points) != done_issues:
         print(f'{competency} has a score update!!!')
         print(f'Current points = {current_points}/{max_points}')
@@ -365,17 +356,16 @@ for c in table_c_list:
     # )
 
 
-
-        # print(f'{issue} is a/an {issue_type} and in the following status: {issue_status}')
 #     # issue.delete()
     
     
 
 
 
+#------------------------------------#
+#----------CALCULATE POINTS----------#
+#------------------------------------#
 
-
-#-----Calculate points-----#
 current_points = []
 total_points = []
 table_c_list = get_comps(db_client)
