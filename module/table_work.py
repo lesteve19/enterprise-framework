@@ -161,131 +161,131 @@ for p in table_p_list:
     table_projs.append(p["projname"])
 
 
-# print("----------------------------------------------------")
-# print("--------------------COMPETENCIES--------------------")
-# print("----------------------------------------------------")
+print("----------------------------------------------------")
+print("--------------------COMPETENCIES--------------------")
+print("----------------------------------------------------")
 
-# #---Iterate through each line in foundations list and create separate objects---#
-# for entry in core_list:
+#---Iterate through each line in foundations list and create separate objects---#
+for entry in core_list:
     
-# #-Grab competency name from foundations list-#
-#     comp_itself = entry.split(',', 1)[0]
-#     components = comp_itself.split('-')
-#     core_comps.append(comp_itself)
+#-Grab competency name from foundations list-#
+    comp_itself = entry.split(',', 1)[0]
+    components = comp_itself.split('-')
+    core_comps.append(comp_itself)
     
-# #-Grab associated project names from foundations list-#
-#     comp_projects = entry.split(',', 1)[1]
-#     comp_projects = comp_projects.replace('"','')
-#     comp_projects = comp_projects.split(',')
-#     for cproject in comp_projects:
-#         proj_dict = {}
-#         proj_dict["projname"]=cproject
-#         proj_dict["projsector"]=components[0]
-#         proj_map.append(proj_dict)
+#-Grab associated project names from foundations list-#
+    comp_projects = entry.split(',', 1)[1]
+    comp_projects = comp_projects.replace('"','')
+    comp_projects = comp_projects.split(',')
+    for cproject in comp_projects:
+        proj_dict = {}
+        proj_dict["projname"]=cproject
+        proj_dict["projsector"]=components[0]
+        proj_map.append(proj_dict)
 
-# #---Check to see if competency from foundations list exists in dynamo table---#
-#     if comp_itself not in table_comps:
-#         c_data = dict(
-#             sector = components[0],
-#             category = components[1],
-#             action = components[2],
-#             solution = components[3],
-#             integration = components[4],
-#             current_points = 0,
-#             max_points = len(comp_projects)*tasks,
-#             project_list = comp_projects,
-#         )
+#---Check to see if competency from foundations list exists in dynamo table---#
+    if comp_itself not in table_comps:
+        c_data = dict(
+            sector = components[0],
+            category = components[1],
+            action = components[2],
+            solution = components[3],
+            integration = components[4],
+            current_points = 0,
+            max_points = len(comp_projects)*tasks,
+            project_list = comp_projects,
+        )
 
-# #---Populate competency table---#
-#         print(f'POPULATING {comp_itself} in Competency DynamoDB table...')
-#         with open('comp_table_template.json', 'r') as c_json_file:
-#             c_content = ''.join(c_json_file.readlines())
-#             c_template = Template(c_content)
-#             c_configuration = json.loads(c_template.substitute(c_data))
-#             db_client.put_item(
-#                 TableName = comp_table,
-#                 Item = c_configuration
-#             )
+#---Populate competency table---#
+        print(f'POPULATING {comp_itself} in Competency DynamoDB table...')
+        with open('comp_table_template.json', 'r') as c_json_file:
+            c_content = ''.join(c_json_file.readlines())
+            c_template = Template(c_content)
+            c_configuration = json.loads(c_template.substitute(c_data))
+            db_client.put_item(
+                TableName = comp_table,
+                Item = c_configuration
+            )
 
-#     else:
-#         print(f'.....{comp_itself} .....already exists')
-#         continue
+    else:
+        print(f'.....{comp_itself} .....already exists')
+        continue
 
-# #-----Delete any competencies that are no longer used-----#
-# for c in table_c_list:
-#     if c["compname"] not in core_comps:
-#         print(f'REMOVING {c["compname"]} from table, as it is no longer in the primary competency list')
-#         db_client.delete_item(
-#             TableName = comp_table,
-#             Key = {
-#                 "competency": {
-#                     "S": c["compname"]
-#                 }
-#             }
-#             )
+#-----Delete any competencies that are no longer used-----#
+for c in table_c_list:
+    if c["compname"] not in core_comps:
+        print(f'REMOVING {c["compname"]} from table, as it is no longer in the primary competency list')
+        db_client.delete_item(
+            TableName = comp_table,
+            Key = {
+                "competency": {
+                    "S": c["compname"]
+                }
+            }
+            )
 
 
-# print("------------------------------------------------")
-# print("--------------------PROJECTS--------------------")
-# print("------------------------------------------------")
+print("------------------------------------------------")
+print("--------------------PROJECTS--------------------")
+print("------------------------------------------------")
 
-# #---Pull in projects from foundations list and create jira connection---#
-# core_projs = [i for n, i in enumerate(proj_map) if i not in proj_map[:n]]
-# jira = jira_conn()
+#---Pull in projects from foundations list and create jira connection---#
+core_projs = [i for n, i in enumerate(proj_map) if i not in proj_map[:n]]
+jira = jira_conn()
 
-# for proj in core_projs:
-#     projname = proj["projname"].strip()
+for proj in core_projs:
+    projname = proj["projname"].strip()
 
-# #---Create JIRA EPIC/Project if it doesn't exist---#
-#     if projname not in table_projs:
-#         epic_dict = {
-#             'project': {'id': jira_proj_id},
-#             'summary': f'{projname}',
-#             'description': f'{projname}',
-#             'issuetype': {'name': 'Epic'},
-#             'labels': [f'entfrm-sect-{proj["projsector"]}'],
-#         }
-#         ejid = jira.create_issue(fields=epic_dict)
-#         print("-----------")
-#         print(f'{ejid} has been created as an Epic issue for {projname}...')
-#         print("------")
+#---Create JIRA EPIC/Project if it doesn't exist---#
+    if projname not in table_projs:
+        epic_dict = {
+            'project': {'id': jira_proj_id},
+            'summary': f'{projname}',
+            'description': f'{projname}',
+            'issuetype': {'name': 'Epic'},
+            'labels': [f'entfrm-sect-{proj["projsector"]}'],
+        }
+        ejid = jira.create_issue(fields=epic_dict)
+        print("-----------")
+        print(f'{ejid} has been created as an Epic issue for {projname}...')
+        print("------")
 
-# #---Create JIRA Stories/Subtasks under EPIC/Project---#
-#         for task in checklist:
-#             key = list(task.keys())[0]
-#             for value in task[key]:
-#                 story_dict = {
-#                     'project': {'id': jira_proj_id},
-#                     'summary': f'{key}-{value}-{projname}',
-#                     'description': f'{key}-{value}-{projname}',
-#                     'issuetype': {'name': 'Story'},
-#                     'labels': [f'entfrm-sect-{proj["projsector"]}', f'entfrm-imp-{key}'],
-#                     'parent': {'key': f'{ejid}'},
-#                 }
+#---Create JIRA Stories/Subtasks under EPIC/Project---#
+        for task in checklist:
+            key = list(task.keys())[0]
+            for value in task[key]:
+                story_dict = {
+                    'project': {'id': jira_proj_id},
+                    'summary': f'{key}-{value}-{projname}',
+                    'description': f'{key}-{value}-{projname}',
+                    'issuetype': {'name': 'Story'},
+                    'labels': [f'entfrm-sect-{proj["projsector"]}', f'entfrm-imp-{key}'],
+                    'parent': {'key': f'{ejid}'},
+                }
             
-#                 sjid = jira.create_issue(fields=story_dict)
-#                 print(f'{sjid} has been created as a story under the Epic {ejid} for {key}-{value}-{projname}...')
+                sjid = jira.create_issue(fields=story_dict)
+                print(f'{sjid} has been created as a story under the Epic {ejid} for {key}-{value}-{projname}...')
 
-#         p_data = dict(
-#             project_name = projname,
-#             jira_id = ejid,
-#         )
+        p_data = dict(
+            project_name = projname,
+            jira_id = ejid,
+        )
 
-# #---Populate projects table---#
-#         print("----------------")
-#         print(f'POPULATING {projname} in Projects DynamoDB table...')
-#         with open('proj_table_template.json', 'r') as p_json_file:
-#             p_content = ''.join(p_json_file.readlines())
-#             p_template = Template(p_content)
-#             p_configuration = json.loads(p_template.substitute(p_data))
-#             db_client.put_item(
-#                 TableName = proj_table,
-#                 Item = p_configuration
-#             )
+#---Populate projects table---#
+        print("----------------")
+        print(f'POPULATING {projname} in Projects DynamoDB table...')
+        with open('proj_table_template.json', 'r') as p_json_file:
+            p_content = ''.join(p_json_file.readlines())
+            p_template = Template(p_content)
+            p_configuration = json.loads(p_template.substitute(p_data))
+            db_client.put_item(
+                TableName = proj_table,
+                Item = p_configuration
+            )
     
-#     else:
-#         print(f'.....{projname} .....already exists')
-#         continue
+    else:
+        print(f'.....{projname} .....already exists')
+        continue
 
 
 #---DELETE PROJECTS SECTION HERE---#
@@ -304,50 +304,50 @@ jira = jira_conn()
 # for issue in issues:
 #     issue.delete()
 
-# #---Gather info on JIRA tasks---#
-# for c in table_c_list:
-#     child_issues = 0
-#     done_issues = 0
-#     competency = c["compname"]
-#     current_points = c["currentpoints"]
-#     max_points = c["maxpoints"]
-#     projects = c["projectlist"].replace('[','').replace(']','').replace("'", "")
-#     projects = projects.split(",")
-#     for project in projects:
-#         project = project.strip()
-#         response = db_client.get_item(
-#             TableName=proj_table,
-#             Key={
-#                 'project': {'S': project}
-#             }
-#         )
-#         jid = response['Item']['jira-id']['S']
-#         issues = jira.search_issues(f'project = {jira_proj_id} AND parent = {jid}')
-#         for issue in issues:
-#             issue.delete()
-            # child_issues = child_issues + 1
-            # issue_status = issue.fields.status
-            # if str(issue_status) == "Done":
-            #     done_issues = done_issues + 1
+#---Gather info on JIRA tasks---#
+for c in table_c_list:
+    child_issues = 0
+    done_issues = 0
+    competency = c["compname"]
+    current_points = c["currentpoints"]
+    max_points = c["maxpoints"]
+    projects = c["projectlist"].replace('[','').replace(']','').replace("'", "")
+    projects = projects.split(",")
+    for project in projects:
+        project = project.strip()
+        response = db_client.get_item(
+            TableName=proj_table,
+            Key={
+                'project': {'S': project}
+            }
+        )
+        jid = response['Item']['jira-id']['S']
+        issues = jira.search_issues(f'project = {jira_proj_id} AND parent = {jid}')
+        for issue in issues:
+            # issue.delete()
+            child_issues = child_issues + 1
+            issue_status = issue.fields.status
+            if str(issue_status) == "Done":
+                done_issues = done_issues + 1
 
-# #---Update table if project task status changes---#
-#     if int(current_points) != done_issues:
-#         print(f'{competency} has a score update!!!')
-#         print(f'Current points = {current_points}/{max_points}')
-#         print(f'UPDATED points = {done_issues}/{max_points}')
-#         update_curr = db_client.update_item(
-#             TableName=comp_table,
-#             Key={
-#                 'competency': {'S': competency}
-#             },
-#             UpdateExpression="SET #currentpoints = :currentpoints",
-#             ExpressionAttributeNames={
-#                 "#currentpoints": "current-points"
-#             },
-#             ExpressionAttributeValues={
-#                 ":currentpoints": {"N":str(done_issues)}
-#             }
-#         )
+#---Update table if project task status changes---#
+    if int(current_points) != done_issues:
+        print(f'{competency} has a score update!!!')
+        print(f'Current points = {current_points}/{max_points}')
+        print(f'UPDATED points = {done_issues}/{max_points}')
+        update_curr = db_client.update_item(
+            TableName=comp_table,
+            Key={
+                'competency': {'S': competency}
+            },
+            UpdateExpression="SET #currentpoints = :currentpoints",
+            ExpressionAttributeNames={
+                "#currentpoints": "current-points"
+            },
+            ExpressionAttributeValues={
+                ":currentpoints": {"N":str(done_issues)}
+            }
+        )
 
     # update_max = db_client.update_item(
     #     TableName=comp_table,
@@ -371,51 +371,51 @@ jira = jira_conn()
 #----------CALCULATE POINTS----------#
 #------------------------------------#
 
-# current_points = []
-# total_points = []
-# table_c_list = get_comps(db_client)
-# sector_list = []
-# s_list = []
+current_points = []
+total_points = []
+table_c_list = get_comps(db_client)
+sector_list = []
+s_list = []
 
-# for comp in table_c_list:
-#     if comp["sector"] not in sector_list:
-#         sector_list.append(comp["sector"])
-#         sector_dict = {"sector": comp["sector"], "current": comp["currentpoints"], "max": comp["maxpoints"], "total": 1}
-#         s_list.append(sector_dict)
-#     else:
-#         for s in s_list:
-#             if s["sector"] == comp["sector"]:
-#                 newcurrent = int(s["current"])+int(comp["currentpoints"])
-#                 newmax = int(s["max"])+int(comp["maxpoints"])
-#                 newtotal = s["total"]+1
-#                 s.update({"sector": comp["sector"], "current": int(newcurrent), "max": int(newmax), "total": int(newtotal)})
-#     current_points.append(int(comp["currentpoints"]))
-#     total_points.append(int(comp["maxpoints"]))
+for comp in table_c_list:
+    if comp["sector"] not in sector_list:
+        sector_list.append(comp["sector"])
+        sector_dict = {"sector": comp["sector"], "current": comp["currentpoints"], "max": comp["maxpoints"], "total": 1}
+        s_list.append(sector_dict)
+    else:
+        for s in s_list:
+            if s["sector"] == comp["sector"]:
+                newcurrent = int(s["current"])+int(comp["currentpoints"])
+                newmax = int(s["max"])+int(comp["maxpoints"])
+                newtotal = s["total"]+1
+                s.update({"sector": comp["sector"], "current": int(newcurrent), "max": int(newmax), "total": int(newtotal)})
+    current_points.append(int(comp["currentpoints"]))
+    total_points.append(int(comp["maxpoints"]))
 
 
-# for sec in s_list:
-#     per = int(sec["current"])/int(sec["max"])
-#     print("-----------------------------------------------")
-#     print("-----------------------------------------------")
-#     print(f'{sec["sector"].upper()} SECTOR')
-#     print(f'{sec["sector"]} has {sec["total"]} core competencies')
-#     print(f'Current {sec["sector"]} points:  {sec["current"]}')
-#     print(f'Total {sec["sector"]} points:    {sec["max"]}')
-#     print(f'{sec["sector"]} percentage:  {round(per*100,2)}%')
+for sec in s_list:
+    per = int(sec["current"])/int(sec["max"])
+    print("-----------------------------------------------")
+    print("-----------------------------------------------")
+    print(f'{sec["sector"].upper()} SECTOR')
+    print(f'{sec["sector"]} has {sec["total"]} core competencies')
+    print(f'Current {sec["sector"]} points:  {sec["current"]}')
+    print(f'Total {sec["sector"]} points:    {sec["max"]}')
+    print(f'{sec["sector"]} percentage:  {round(per*100,2)}%')
 
-# cp = sum(current_points)
-# tp = sum(total_points)
-# pp = cp/tp
-# percent = round(pp*100,2)
+cp = sum(current_points)
+tp = sum(total_points)
+pp = cp/tp
+percent = round(pp*100,2)
 
-# print("-----------------------------------------------")
-# print("-----------------------------------------------")
-# print("-----------------------------------------------")
-# print("-----------------------------------------------")
-# print("TOTALS")
-# print(f'Total core competencies:  {len(table_c_list)}')
-# print(f'Current points achieved:  {cp}')
-# print(f'Total possible points:    {tp}')
-# print(f'Total percentage:         {percent}%')
-# print("-----------------------------------------------")
-# print("-----------------------------------------------")
+print("-----------------------------------------------")
+print("-----------------------------------------------")
+print("-----------------------------------------------")
+print("-----------------------------------------------")
+print("TOTALS")
+print(f'Total core competencies:  {len(table_c_list)}')
+print(f'Current points achieved:  {cp}')
+print(f'Total possible points:    {tp}')
+print(f'Total percentage:         {percent}%')
+print("-----------------------------------------------")
+print("-----------------------------------------------")
