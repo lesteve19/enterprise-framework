@@ -300,13 +300,9 @@ for p in table_p_list:
 table_c_list = get_comps(db_client)
 jira = jira_conn()
 
-issues = jira.search_issues(f'project = {jira_proj_id} AND parent = ENTFRM-1117')
-for issue in issues:
-    issue.delete()
-
-issues = jira.search_issues(f'project = {jira_proj_id} AND type = Epic')
-for issue in issues:
-    issue.delete()
+# issues = jira.search_issues(f'project = {jira_proj_id} AND type = Epic')
+# for issue in issues:
+#     issue.delete()
 
 # #---Gather info on JIRA tasks---#
 # for c in table_c_list:
