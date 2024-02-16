@@ -300,27 +300,35 @@ for p in table_p_list:
 table_c_list = get_comps(db_client)
 jira = jira_conn()
 
-#---Gather info on JIRA tasks---#
-for c in table_c_list:
-    child_issues = 0
-    done_issues = 0
-    competency = c["compname"]
-    current_points = c["currentpoints"]
-    max_points = c["maxpoints"]
-    projects = c["projectlist"].replace('[','').replace(']','').replace("'", "")
-    projects = projects.split(",")
-    for project in projects:
-        project = project.strip()
-        response = db_client.get_item(
-            TableName=proj_table,
-            Key={
-                'project': {'S': project}
-            }
-        )
-        jid = response['Item']['jira-id']['S']
-        issues = jira.search_issues(f'project = {jira_proj_id} AND parent = {jid}')
-        for issue in issues:
-            issue.delete()
+issues = jira.search_issues(f'project = {jira_proj_id} AND parent = ENTFRM-1117')
+for issue in issues:
+    issue.delete()
+
+issues = jira.search_issues(f'project = {jira_proj_id} AND type = Epic')
+for issue in issues:
+    issue.delete()
+
+# #---Gather info on JIRA tasks---#
+# for c in table_c_list:
+#     child_issues = 0
+#     done_issues = 0
+#     competency = c["compname"]
+#     current_points = c["currentpoints"]
+#     max_points = c["maxpoints"]
+#     projects = c["projectlist"].replace('[','').replace(']','').replace("'", "")
+#     projects = projects.split(",")
+#     for project in projects:
+#         project = project.strip()
+#         response = db_client.get_item(
+#             TableName=proj_table,
+#             Key={
+#                 'project': {'S': project}
+#             }
+#         )
+#         jid = response['Item']['jira-id']['S']
+#         issues = jira.search_issues(f'project = {jira_proj_id} AND parent = {jid}')
+#         for issue in issues:
+#             issue.delete()
             # child_issues = child_issues + 1
             # issue_status = issue.fields.status
             # if str(issue_status) == "Done":
