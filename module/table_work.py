@@ -299,6 +299,7 @@ for proj in core_projs:
 #---Rescan Dynamo table and refresh JIRA connection---#
 table_c_list = get_comps(db_client)
 jira = jira_conn()
+print(jira)
 
 #------------------------#
 #---DELETE JIRA ISSUES---#

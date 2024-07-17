@@ -15,7 +15,7 @@ phases:
     commands:
       - python --version
       - pip install --no-input 'jira[cli]'
-      - curl -s -qL -o terraform_install.zip https://releases.hashicorp.com/terraform/1.7.1/terraform_1.7.1_linux_amd64.zip
+      - curl -s -qL -o terraform_install.zip https://releases.hashicorp.com/terraform/1.9.2/terraform_1.9.2_linux_amd64.zip
       - unzip terraform_install.zip -d /usr/bin/
       - chmod +x /usr/bin/terraform
       - terraform --version
