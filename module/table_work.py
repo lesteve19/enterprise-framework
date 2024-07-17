@@ -304,6 +304,7 @@ jira = jira_conn()
 #---DELETE JIRA ISSUES---#
 #------------------------#
 issues = jira.search_issues(f'project = {jira_proj_id} AND type = Epic')
+print(f'here are the issues:  {issues}')
 for issue in issues:
     issue.delete()
 
