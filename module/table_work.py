@@ -12,6 +12,10 @@ from botocore.exceptions import ClientError
 #----------GLOBAL VARIABLES----------#
 #------------------------------------#
 
+
+delete_mode = True
+
+
 region = "us-east-2"
 project = sys.argv[1]
 comp_table = f'{project}-competencies'
@@ -229,66 +233,80 @@ print("------------------------------------------------")
 print("--------------------PROJECTS--------------------")
 print("------------------------------------------------")
 
-#---Pull in projects from foundations list and create jira connection---#
-core_projs = [i for n, i in enumerate(proj_map) if i not in proj_map[:n]]
+#---Create jira connection---#
 jira = jira_conn()
 
-for proj in core_projs:
-    projname = proj["projname"].strip()
+if not delete_mode:
+
+#---Pull in projects from foundations list---#
+    core_projs = [i for n, i in enumerate(proj_map) if i not in proj_map[:n]]
+
+    for proj in core_projs:
+        projname = proj["projname"].strip()
 
 #---Create JIRA EPIC/Project if it doesn't exist---#
-    if projname not in table_projs:
-        epic_dict = {
-            'project': {'id': jira_proj_id},
-            'summary': f'{projname}',
-            'description': f'{projname}',
-            'issuetype': {'name': 'Epic'},
-            'labels': [f'entfrm-sect-{proj["projsector"]}'],
-        }
-        ejid = jira.create_issue(fields=epic_dict)
-        print("-----------")
-        print(f'{ejid} has been created as an Epic issue for {projname}...')
-        print("------")
+        if projname not in table_projs:
+            epic_dict = {
+                'project': {'id': jira_proj_id},
+                'summary': f'{projname}',
+                'description': f'{projname}',
+                'issuetype': {'name': 'Epic'},
+                'labels': [f'entfrm-sect-{proj["projsector"]}'],
+            }
+            ejid = jira.create_issue(fields=epic_dict)
+            print("-----------")
+            print(f'{ejid} has been created as an Epic issue for {projname}...')
+            print("------")
 
 #---Create JIRA Stories/Subtasks under EPIC/Project---#
-        for task in checklist:
-            key = list(task.keys())[0]
-            for value in task[key]:
-                story_dict = {
-                    'project': {'id': jira_proj_id},
-                    'summary': f'{key}-{value}-{projname}',
-                    'description': f'{key}-{value}-{projname}',
-                    'issuetype': {'name': 'Story'},
-                    'labels': [f'entfrm-sect-{proj["projsector"]}', f'entfrm-imp-{key}'],
-                    'parent': {'key': f'{ejid}'},
-                }
-            
-                sjid = jira.create_issue(fields=story_dict)
-                print(f'{sjid} has been created as a story under the Epic {ejid} for {key}-{value}-{projname}...')
+            for task in checklist:
+                key = list(task.keys())[0]
+                for value in task[key]:
+                    story_dict = {
+                        'project': {'id': jira_proj_id},
+                        'summary': f'{key}-{value}-{projname}',
+                        'description': f'{key}-{value}-{projname}',
+                        'issuetype': {'name': 'Story'},
+                        'labels': [f'entfrm-sect-{proj["projsector"]}', f'entfrm-imp-{key}'],
+                        'parent': {'key': f'{ejid}'},
+                    }
+                
+                    sjid = jira.create_issue(fields=story_dict)
+                    print(f'{sjid} has been created as a story under the Epic {ejid} for {key}-{value}-{projname}...')
 
-        p_data = dict(
-            project_name = projname,
-            jira_id = ejid,
-        )
+            p_data = dict(
+                project_name = projname,
+                jira_id = ejid,
+            )
 
 #---Populate projects table---#
-        print("----------------")
-        print(f'POPULATING {projname} in Projects DynamoDB table...')
-        with open('proj_table_template.json', 'r') as p_json_file:
-            p_content = ''.join(p_json_file.readlines())
-            p_template = Template(p_content)
-            p_configuration = json.loads(p_template.substitute(p_data))
-            db_client.put_item(
-                TableName = proj_table,
-                Item = p_configuration
-            )
-    
-    else:
-        print(f'.....{projname} .....already exists')
-        continue
+            print("----------------")
+            print(f'POPULATING {projname} in Projects DynamoDB table...')
+            with open('proj_table_template.json', 'r') as p_json_file:
+                p_content = ''.join(p_json_file.readlines())
+                p_template = Template(p_content)
+                p_configuration = json.loads(p_template.substitute(p_data))
+                db_client.put_item(
+                    TableName = proj_table,
+                    Item = p_configuration
+                )
+        
+        else:
+            print(f'.....{projname} .....already exists')
+            continue
 
 
-#---DELETE PROJECTS SECTION HERE---#
+#------------------------#
+#---DELETE JIRA ISSUES---#
+#------------------------#
+else:
+    epic_issues = jira.search_issues(f'project = {jira_proj_id} AND type = Epic')
+    story_issues = jira.search_issues(f'project = {jira_proj_id} AND type = Story')
+    for epic in epic_issues:
+        epic.delete()
+    for story in story_issues:
+        story.delete()
+    db_client.delete_table(TableName=proj_table)
 
 
 
@@ -296,63 +314,55 @@ for proj in core_projs:
 #----------JIRA STATUS GRAB AND TABLE UPDATES----------#
 #------------------------------------------------------#
 
-#---Rescan Dynamo table and refresh JIRA connection---#
-table_c_list = get_comps(db_client)
-jira = jira_conn()
-print(jira)
+if not delete_mode:
 
-#------------------------#
-#---DELETE JIRA ISSUES---#
-#------------------------#
-issues = jira.search_issues(f'project = {jira_proj_id} AND type = Epic')
-print(f'here are the issues:  {issues}')
-for issue in issues:
-    issue.delete()
+#---Rescan Dynamo table and refresh JIRA connection---#
+    table_c_list = get_comps(db_client)
+    jira = jira_conn()
 
 #---Gather info on JIRA tasks---#
-for c in table_c_list:
-    child_issues = 0
-    done_issues = 0
-    competency = c["compname"]
-    current_points = c["currentpoints"]
-    max_points = c["maxpoints"]
-    projects = c["projectlist"].replace('[','').replace(']','').replace("'", "")
-    projects = projects.split(",")
-    for project in projects:
-        project = project.strip()
-        response = db_client.get_item(
-            TableName=proj_table,
-            Key={
-                'project': {'S': project}
-            }
-        )
-        jid = response['Item']['jira-id']['S']
-        issues = jira.search_issues(f'project = {jira_proj_id} AND parent = {jid}')
-        for issue in issues:
-            # issue.delete()
-            child_issues = child_issues + 1
-            issue_status = issue.fields.status
-            if str(issue_status) == "Done":
-                done_issues = done_issues + 1
+    for c in table_c_list:
+        child_issues = 0
+        done_issues = 0
+        competency = c["compname"]
+        current_points = c["currentpoints"]
+        max_points = c["maxpoints"]
+        projects = c["projectlist"].replace('[','').replace(']','').replace("'", "")
+        projects = projects.split(",")
+        for project in projects:
+            project = project.strip()
+            response = db_client.get_item(
+                TableName=proj_table,
+                Key={
+                    'project': {'S': project}
+                }
+            )
+            jid = response['Item']['jira-id']['S']
+            issues = jira.search_issues(f'project = {jira_proj_id} AND parent = {jid}')
+            for issue in issues:
+                child_issues = child_issues + 1
+                issue_status = issue.fields.status
+                if str(issue_status) == "Done":
+                    done_issues = done_issues + 1
 
 #---Update table if project task status changes---#
-    if int(current_points) != done_issues:
-        print(f'{competency} has a score update!!!')
-        print(f'Current points = {current_points}/{max_points}')
-        print(f'UPDATED points = {done_issues}/{max_points}')
-        update_curr = db_client.update_item(
-            TableName=comp_table,
-            Key={
-                'competency': {'S': competency}
-            },
-            UpdateExpression="SET #currentpoints = :currentpoints",
-            ExpressionAttributeNames={
-                "#currentpoints": "current-points"
-            },
-            ExpressionAttributeValues={
-                ":currentpoints": {"N":str(done_issues)}
-            }
-        )
+        if int(current_points) != done_issues:
+            print(f'{competency} has a score update!!!')
+            print(f'Current points = {current_points}/{max_points}')
+            print(f'UPDATED points = {done_issues}/{max_points}')
+            update_curr = db_client.update_item(
+                TableName=comp_table,
+                Key={
+                    'competency': {'S': competency}
+                },
+                UpdateExpression="SET #currentpoints = :currentpoints",
+                ExpressionAttributeNames={
+                    "#currentpoints": "current-points"
+                },
+                ExpressionAttributeValues={
+                    ":currentpoints": {"N":str(done_issues)}
+                }
+            )
     
     #---------------------------------------#
 
