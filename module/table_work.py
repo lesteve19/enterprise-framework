@@ -300,7 +300,7 @@ if not delete_mode:
 #---DELETE JIRA ISSUES---#
 #------------------------#
 else:
-    epic_issues = jira.search_issues(jql_str = f'project = {jira_proj_id} AND type = Epic', maxResults = 100)
+    epic_issues = jira.search_issues(jql_str = f'project = {jira_proj_id} AND type = Epic', maxResults = False)
     story_issues = jira.search_issues(jql_str = f'project = {jira_proj_id} AND type = Story', maxResults= False)
     for epic in epic_issues:
         epic.delete()
