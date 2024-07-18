@@ -4,6 +4,7 @@ env:
   shell: bash
   variables:
     PROJECT: "enterprise-framework"
+    DELETE_MODE: True
   # secrets-manager:
   #   key: secret-id:json-key:version-stage:version-id
 
@@ -28,7 +29,7 @@ phases:
       # - terraform destroy -auto-approve -var="project_name=$PROJECT"
       - terraform apply -auto-approve -var="project_name=$PROJECT"
       - cd ../module
-      - python table_work.py $PROJECT
+      - python table_work.py $PROJECT $DELETE_MODE
   # build:
   #   run-as: Linux-user-name
   #   on-failure: ABORT | CONTINUE

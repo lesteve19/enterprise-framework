@@ -13,11 +13,9 @@ from botocore.exceptions import ClientError
 #------------------------------------#
 
 
-delete_mode = True
-
-
 region = "us-east-2"
 project = sys.argv[1]
+delete_mode = sys.argv[2]
 comp_table = f'{project}-competencies'
 proj_table = f'{project}-projects'
 secret_name = "jira_token"
