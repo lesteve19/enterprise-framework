@@ -310,49 +310,49 @@ for issue in issues:
     issue.delete()
 
 #---Gather info on JIRA tasks---#
-# for c in table_c_list:
-#     child_issues = 0
-#     done_issues = 0
-#     competency = c["compname"]
-#     current_points = c["currentpoints"]
-#     max_points = c["maxpoints"]
-#     projects = c["projectlist"].replace('[','').replace(']','').replace("'", "")
-#     projects = projects.split(",")
-#     for project in projects:
-#         project = project.strip()
-#         response = db_client.get_item(
-#             TableName=proj_table,
-#             Key={
-#                 'project': {'S': project}
-#             }
-#         )
-#         jid = response['Item']['jira-id']['S']
-#         issues = jira.search_issues(f'project = {jira_proj_id} AND parent = {jid}')
-#         for issue in issues:
-#             # issue.delete()
-#             child_issues = child_issues + 1
-#             issue_status = issue.fields.status
-#             if str(issue_status) == "Done":
-#                 done_issues = done_issues + 1
+for c in table_c_list:
+    child_issues = 0
+    done_issues = 0
+    competency = c["compname"]
+    current_points = c["currentpoints"]
+    max_points = c["maxpoints"]
+    projects = c["projectlist"].replace('[','').replace(']','').replace("'", "")
+    projects = projects.split(",")
+    for project in projects:
+        project = project.strip()
+        response = db_client.get_item(
+            TableName=proj_table,
+            Key={
+                'project': {'S': project}
+            }
+        )
+        jid = response['Item']['jira-id']['S']
+        issues = jira.search_issues(f'project = {jira_proj_id} AND parent = {jid}')
+        for issue in issues:
+            # issue.delete()
+            child_issues = child_issues + 1
+            issue_status = issue.fields.status
+            if str(issue_status) == "Done":
+                done_issues = done_issues + 1
 
-# #---Update table if project task status changes---#
-#     if int(current_points) != done_issues:
-#         print(f'{competency} has a score update!!!')
-#         print(f'Current points = {current_points}/{max_points}')
-#         print(f'UPDATED points = {done_issues}/{max_points}')
-#         update_curr = db_client.update_item(
-#             TableName=comp_table,
-#             Key={
-#                 'competency': {'S': competency}
-#             },
-#             UpdateExpression="SET #currentpoints = :currentpoints",
-#             ExpressionAttributeNames={
-#                 "#currentpoints": "current-points"
-#             },
-#             ExpressionAttributeValues={
-#                 ":currentpoints": {"N":str(done_issues)}
-#             }
-#         )
+#---Update table if project task status changes---#
+    if int(current_points) != done_issues:
+        print(f'{competency} has a score update!!!')
+        print(f'Current points = {current_points}/{max_points}')
+        print(f'UPDATED points = {done_issues}/{max_points}')
+        update_curr = db_client.update_item(
+            TableName=comp_table,
+            Key={
+                'competency': {'S': competency}
+            },
+            UpdateExpression="SET #currentpoints = :currentpoints",
+            ExpressionAttributeNames={
+                "#currentpoints": "current-points"
+            },
+            ExpressionAttributeValues={
+                ":currentpoints": {"N":str(done_issues)}
+            }
+        )
     
     #---------------------------------------#
 
