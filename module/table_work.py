@@ -12,7 +12,6 @@ from botocore.exceptions import ClientError
 #----------GLOBAL VARIABLES----------#
 #------------------------------------#
 
-
 region = "us-east-2"
 project = sys.argv[1]
 delete_mode = sys.argv[2]
@@ -25,6 +24,8 @@ jira_server = "https://keepitsts.atlassian.net"
 jira_user = "steven.lecompte@simpletechnology.io"
 jira_proj_id = 10069
 
+
+#---Solution Implementation Checklist---#
 checklist = [
     {"Alerting": ["Thresholds", "Notifications"]},
     {"Automation": ["Code/Version Control", "IAC", "Config Mgmt", "Functional Tests", "Security Tests"]},
@@ -36,11 +37,14 @@ checklist = [
     {"Security": ["IAM", "Network", "Data Mgmt", "Secrets Mgmt"]}
 ]
 
+#---Count tasks in checklist---#
 tasks = 0
 for task in checklist:
     key = list(task.keys())[0]
     for value in task[key]:
         tasks = tasks +1
+
+
 
 #-----------------------------#
 #----------FUNCTIONS----------#
@@ -162,7 +166,6 @@ for c in table_c_list:
 for p in table_p_list:
     table_projs.append(p["projname"])
 
-
 print("----------------------------------------------------")
 print("--------------------COMPETENCIES--------------------")
 print("----------------------------------------------------")
@@ -225,7 +228,6 @@ for c in table_c_list:
                 }
             }
             )
-
 
 print("------------------------------------------------")
 print("--------------------PROJECTS--------------------")
@@ -294,9 +296,10 @@ if not delete_mode:
             continue
 
 
-#------------------------#
-#---DELETE JIRA ISSUES---#
-#------------------------#
+
+#-----------------------------------------------#
+#---DELETE MODE - JIRA and DynamoDB Resources---#
+#-----------------------------------------------#
 else:
     epic_issues = jira.search_issues(jql_str = f'project = {jira_proj_id} AND type = Epic', maxResults = False)
     story_issues = jira.search_issues(jql_str = f'project = {jira_proj_id} AND type = Story', maxResults= False)
@@ -305,6 +308,7 @@ else:
     for story in story_issues:
         story.delete()
     db_client.delete_table(TableName=proj_table)
+    db_client.delete_table(TableName=comp_table)
 
 
 
@@ -361,24 +365,6 @@ if not delete_mode:
                     ":currentpoints": {"N":str(done_issues)}
                 }
             )
-    
-    #---------------------------------------#
-
-    # update_max = db_client.update_item(
-    #     TableName=comp_table,
-    #     Key={
-    #         'competency': c["compname"]
-    #     },
-    #     UpdateExpression="SET max-points = :maxpoints",
-    #     ExpressionAttributeValues={
-    #         ":maxpoints": child_issues
-    #     }
-    # )
-
-
-#     # issue.delete()
-    
-    
 
 
 
